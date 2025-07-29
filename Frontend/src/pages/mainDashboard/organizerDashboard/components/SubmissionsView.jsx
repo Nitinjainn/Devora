@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../../../../components/CommonUI/button";
 import { Card, CardHeader, CardTitle, CardContent } from "../../../../components/CommonUI/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/CommonUI/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../../components/DashboardUI/dialog";
 import { 
   ArrowLeft, 
   FileCheck, 
@@ -10,7 +11,8 @@ import {
   Download,
   Eye,
   Trophy,
-  Users
+  Users,
+  FileText
 } from "lucide-react";
 
 export default function SubmissionsView({
@@ -21,8 +23,7 @@ export default function SubmissionsView({
   selectedProblemStatement = 'All',
   setSelectedProblemStatement = () => {},
   setShowSubmissionsView = () => {},
-  selectedSubmissionId,
-  setSelectedSubmissionId,
+  // Remove selectedSubmissionId/setSelectedSubmissionId from props, manage locally
   onExportSubmissions = () => {},
 }) {
   // Helper function to extract problem statement text
@@ -93,6 +94,49 @@ export default function SubmissionsView({
       return problemStatementStats[ps]?.round2 || 0;
     }
     return 0;
+  };
+
+  // Modal state and details
+  const [submissionDetailsModalOpen, setSubmissionDetailsModalOpen] = useState(false);
+  const [submissionDetails, setSubmissionDetails] = useState(null);
+  const [loadingSubmissionDetails, setLoadingSubmissionDetails] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
+
+  // Format date helper
+  const formatDate = (date) => date ? new Date(date).toLocaleString() : '--';
+
+  // Fetch full submission details and evaluations
+  const handleViewSubmission = async (submission) => {
+    setSelectedSubmission(submission);
+    setSubmissionDetailsModalOpen(true);
+    setLoadingSubmissionDetails(true);
+    try {
+      const token = localStorage.getItem('token');
+      // Fetch detailed submission information
+      const response = await fetch(`http://localhost:3000/api/submission-form/admin/${submission._id}`);
+      let submissionData = null;
+      if (response.ok) {
+        submissionData = await response.json();
+      }
+      // Fetch judge evaluations for this submission
+      const evaluationsResponse = await fetch(`http://localhost:3000/api/scores/submission/${submission._id}`);
+      let evaluations = [];
+      if (evaluationsResponse.ok) {
+        evaluations = await evaluationsResponse.json();
+      }
+      // Merge with original submission data
+      const mergedSubmission = {
+        ...submissionData?.submission,
+        ...submission,
+        evaluations,
+        assignedJudges: submission.assignedJudges || [],
+      };
+      setSubmissionDetails(mergedSubmission);
+    } catch (error) {
+      setSubmissionDetails(null);
+    } finally {
+      setLoadingSubmissionDetails(false);
+    }
   };
 
   return (
@@ -366,7 +410,7 @@ export default function SubmissionsView({
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setSelectedSubmissionId(submission._id || submission.id)}
+                            onClick={() => handleViewSubmission(submission)}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             <Eye className="w-4 h-4 mr-1" />
@@ -382,6 +426,36 @@ export default function SubmissionsView({
           </CardContent>
         </Card>
       </div>
+      {/* Submission Details Modal */}
+      <Dialog open={submissionDetailsModalOpen} onOpenChange={setSubmissionDetailsModalOpen}>
+        <DialogContent className="max-w-[98vw] max-h-[98vh] w-[98vw] h-[98vh] overflow-y-auto p-8">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" />
+              Submission Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete view of submission, assigned judges, and evaluations
+            </DialogDescription>
+          </DialogHeader>
+          {loadingSubmissionDetails ? (
+            <div className="flex items-center justify-center py-12">
+              {/* Loader2 icon, fallback to text if not imported */}
+              <span className="ml-2 text-gray-600">Loading submission details...</span>
+            </div>
+          ) : submissionDetails ? (
+            // --- Copy the modal JSX from JudgeManagementAssignments.jsx here ---
+            <div className="bg-gradient-to-b from-slate-50 via-purple-50 to-slate-100 min-h-full">
+              {/* ...modal content as in JudgeManagementAssignments.jsx... */}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <FileText className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p>No submission details available</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
