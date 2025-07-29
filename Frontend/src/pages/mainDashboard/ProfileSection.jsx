@@ -64,6 +64,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "../../components/DashboardUI/alert-dialog";
+import { toast } from "react-hot-toast";
 
 // Add this utility function at the top
 function getCurrentViewFromPath(pathname) {
@@ -221,7 +222,7 @@ export function ProfileSection({ viewUserId }) {
       setTwoFactorEnabled(response.data.enabled);
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        alert("Session expired. Please log in again.");
+         toast.error("Session expired, Please log in again.");
         localStorage.clear();
         window.location.href = "/?modal=login";
       } else {
@@ -322,7 +323,7 @@ export function ProfileSection({ viewUserId }) {
       });
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        alert("Session expired. Please log in again.");
+        toast.error("Session expired, Please log in again.");
         localStorage.clear();
         window.location.href = "/?modal=login";
       } else {
@@ -448,17 +449,24 @@ export function ProfileSection({ viewUserId }) {
         </div>
         {/* Profile Info Section */}
         <div className="relative px-8 pb-8">
-          <button
-            className="p-2 rounded-full hover:bg-gray-100 transition-all ml-auto block mt-2"
-            title="Share Profile"
-            onClick={async () => {
-              const url = `${window.location.origin}/dashboard/profile/${user?._id}`;
-              await navigator.clipboard.writeText(url);
-              alert("Public profile link copied to clipboard!");
-            }}
-          >
-            <Share2Icon className="w-5 h-5 text-gray-600" />
-          </button>
+         <button
+  className="rounded-full hover:bg-gray-100 p-2 transition-all ml-auto block mt-2"
+  style={{ 
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative'
+  }}
+  title="Share Profile"
+  onClick={async () => {
+    const url = `${window.location.origin}/dashboard/profile/${user?._id}`;
+    await navigator.clipboard.writeText(url);
+    toast.success("Public profile link copied to clipboard!");
+  }}
+>
+  <Share2Icon className="w-6 h-6 text-gray-600" style={{ pointerEvents: 'none' }} />
+</button>
+
           {/* Avatar */}
           <div className="flex justify-start -mt-20 mb-6">
             <div className="relative group">
@@ -1933,6 +1941,7 @@ export function ProfileSection({ viewUserId }) {
             <Button
               onClick={handleSaveClick}
               className="flex items-center gap-2 w-full sm:w-auto"
+              variant="blue"
             >
               <Save className="w-4 h-4" />
               Save Changes
@@ -2236,7 +2245,7 @@ export function ProfileSection({ viewUserId }) {
 
   const handleSaveChanges = async () => {
     if (!user?._id || !token) {
-      alert("User not logged in. Please log in again.");
+        toast.error("User not logged in. Please log in again.");
       return;
     }
 
@@ -2307,7 +2316,7 @@ export function ProfileSection({ viewUserId }) {
       setCurrentView("overview");
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert("Failed to update profile");
+          toast.error("Failed to update profile, Please try again.");
     }
   };
 
@@ -2356,7 +2365,7 @@ export function ProfileSection({ viewUserId }) {
       setTimeout(() => setUploadSuccess(false), 3000); // Auto-hide after 3s
     } catch (err) {
       console.error("Image upload failed:", err);
-      alert("Failed to upload image");
+         toast.error("Failed to update image, Please try again.");
     } finally {
       setIsUploading(false); // ✅ Stop loading
     }
@@ -2404,7 +2413,7 @@ export function ProfileSection({ viewUserId }) {
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (err) {
       console.error("Banner upload failed:", err);
-      alert("Failed to upload banner");
+        toast.error("Failed to update banner, Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -2478,7 +2487,7 @@ export function ProfileSection({ viewUserId }) {
 
   const handleRemoveBanner = async () => {
     if (!user?._id || !token) {
-      alert("User not logged in. Please log in again.");
+         toast.error("User not logged in. Please log in again.");
       return;
     }
 
@@ -2512,13 +2521,13 @@ export function ProfileSection({ viewUserId }) {
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error("Error removing banner:", error);
-      alert("Failed to remove banner");
+        toast.error("Failed to remove banner, Please try again.");
     }
   };
 
   const handleRemoveProfileImage = async () => {
     if (!user?._id || !token) {
-      alert("User not logged in. Please log in again.");
+         toast.error("User not logged in. Please log in again.");
       return;
     }
 
@@ -2546,7 +2555,7 @@ export function ProfileSection({ viewUserId }) {
       setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error("Error removing profile image:", error);
-      alert("Failed to remove profile image");
+        toast.error("Failed to remove profile, Please try again.");
     }
   };
 
@@ -2554,12 +2563,34 @@ export function ProfileSection({ viewUserId }) {
     setShowConfirmDialog(true);
   };
 
-  const handleConfirmSave = async () => {
-    setPendingSave(true);
+const handleConfirmSave = async () => {
+  setPendingSave(true);
+  
+  try {
     await handleSaveChanges();
-    setPendingSave(false);
+    
+    // Success toast
+    toast.success("Profile updated successfully!", {
+      description: "Your changes have been saved.",
+      duration: 4000,
+    });
+    
     setShowConfirmDialog(false);
-  };
+    
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    
+    // Error toast
+    toast.error("Failed to save changes", {
+      description: error.message || "Something went wrong. Please try again.",
+      duration: 5000,
+    });
+    
+    
+  } finally {
+    setPendingSave(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-purple-50 to-slate-100 py-10 px-4 sm:px-6 lg:px-8 font-sans">
