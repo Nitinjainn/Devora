@@ -45,6 +45,7 @@ import CustomSubmissionForm from "./components/CustomSubmissionForm";
 import InnerCreatedCard from "./components/InnerCreatedCard"; // Adjust path
 import { cn } from "../../../lib/utils";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 // import { Modal } from '../../../components/CommonUI/modal'; // If you have a modal component, else use a div
 
 export function CreatedHackathons({ onCreateNew }) {
@@ -159,7 +160,7 @@ export function CreatedHackathons({ onCreateNew }) {
       setShowDeleteDialog(false);
       hackathonToDelete.current = null;
     } catch {
-      alert("Error deleting hackathon");
+      toast.error("Error deleting hackathon");
     } finally {
       setDeletingId(null);
     }

@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/CommonUI/select";
+import toast from "react-hot-toast";
 
 export function Announcements() {
 
@@ -80,7 +81,7 @@ export function Announcements() {
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.message || "Failed to send announcement");
-      alert("Announcement sent!");
+      toast.success("Announcement sent!");
       setTitle("");
       setMessage("");
       setAudience("");
@@ -89,7 +90,7 @@ export function Announcements() {
       setShowPreview(false);
       fetchAnnouncements();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 

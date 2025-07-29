@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../components/CommonUI/select";
+import toast from "react-hot-toast";
 
 export function WriteArticle({ onBack, onSubmit }) {
   const navigate = useNavigate(); // Add this hook
@@ -63,7 +64,7 @@ export function WriteArticle({ onBack, onSubmit }) {
 
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      alert("File size exceeds 5MB limit.");
+      toast.error("File size exceeds 5MB limit.");
       return;
     }
 
@@ -84,11 +85,11 @@ export function WriteArticle({ onBack, onSubmit }) {
       if (data.secure_url) {
         setFormData((prev) => ({ ...prev, image: data.secure_url }));
       } else {
-        alert("Image upload failed.");
+        toast.error("Image upload failed.");
       }
     } catch (error) {
       console.error("Cloudinary error", error);
-      alert("Error uploading image.");
+      toast.error("Error uploading image.");
     }
   };
 
@@ -133,7 +134,7 @@ export function WriteArticle({ onBack, onSubmit }) {
     } catch (error) {
       console.error("Submit error:", error);
       setIsSubmitting(false);
-      alert("Submission failed. Try again.");
+      toast.error("Submission failed. Try again.");
     }
   };
 

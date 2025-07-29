@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "../components/CommonUI/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/CommonUI/card";
 import { CheckCircle, XCircle, Gavel, AlertCircle, Award, LogIn, Mail } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function InviteRole() {
   const [searchParams] = useSearchParams();
@@ -81,7 +82,7 @@ export default function InviteRole() {
 
       if (res.ok) {
         const data = await res.json();
-        alert(data.message || `Invite ${action}ed successfully!`);
+        toast.success(data.message || `Invite ${action}ed successfully!`);
         navigate("/dashboard/judge");
       } else {
         const errorData = await res.json();

@@ -6,6 +6,7 @@ import { Button } from "../../../components/CommonUI/button";
 import { Badge } from "../../../components/CommonUI/badge";
 import { Plus, Upload, Info, Eye, Edit, Trash2 } from "lucide-react";
 import CertificateEditor from "./components/CertificateEditor";
+import toast from "react-hot-toast";
 
 function replacePlaceholders(content, sampleData) {
   return content
@@ -55,7 +56,7 @@ export default function CertificatesPage() {
       });
       setTemplates((prev) => prev.filter((t) => t._id !== id));
     } catch {
-      alert("Failed to delete certificate.");
+      toast.error("Failed to delete certificate.");
     }
   };
 

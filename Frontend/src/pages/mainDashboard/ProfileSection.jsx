@@ -2116,6 +2116,7 @@ export function ProfileSection({ viewUserId }) {
           <Button
             className="flex items-center gap-2 w-full sm:w-auto"
             onClick={handlePasswordUpdate}
+            variant="blue"
           >
             <Lock className="w-4 h-4" />
             Update Password
@@ -2231,7 +2232,7 @@ export function ProfileSection({ viewUserId }) {
       </Card>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Button className="w-full sm:w-auto">Save Security Settings</Button>
+        <Button variant="blue" className="w-full sm:w-auto">Save Security Settings</Button>
         <Button
           variant="outline"
           className="w-full sm:w-auto"

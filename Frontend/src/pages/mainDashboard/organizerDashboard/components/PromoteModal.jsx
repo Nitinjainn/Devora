@@ -22,6 +22,7 @@ import {
   BarChart3,
   Clock,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Pricing and placement constants remain unchanged
 const BASE = {
@@ -110,7 +111,7 @@ const PromoteModal = ({ hackathon, onClose, onSuccess }) => {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Failed to launch promotion.");
-      alert("Promotion campaign launched successfully!");
+      toast.success("Promotion campaign launched successfully!");
       if (onSuccess) onSuccess(result.hackathon);
     } catch (err) {
       console.error("API Error:", err);

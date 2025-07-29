@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react"
 import { ArrowLeft, Plus, Upload, Save, Eye, Trash2, Type } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/CommonUI/card" 
+import { toast } from "react-hot-toast";
 
 function getAverageColor(img, x, y, w, h) {
   const canvas = document.createElement("canvas")
@@ -418,7 +419,7 @@ export default function CertificateEditor({ onBack, template, onDelete }) {
 
   const handleSave = async () => {
     if (!selectedImage || !certificateTitle.trim()) {
-      alert("Please upload a certificate image and enter a title before saving.");
+         toast.error("Please upload a certificate image and enter a title before saving.");
       return;
     }
 
@@ -428,7 +429,7 @@ export default function CertificateEditor({ onBack, template, onDelete }) {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Authentication error. Please log in again.");
+           toast.error("Authentication error. Please log in again.");
         setIsSaving(false);
         return;
       }
@@ -482,7 +483,7 @@ export default function CertificateEditor({ onBack, template, onDelete }) {
       });
 
       if (response.ok) {
-        alert("Certificate template saved successfully!");
+           toast.success("Certificate template saved successfully!");
         onBack?.();
       } else {
         const errData = await response.json();
@@ -491,7 +492,7 @@ export default function CertificateEditor({ onBack, template, onDelete }) {
       }
     } catch (error) {
       console.error("Error saving certificate:", error);
-      alert(`Failed to save certificate: ${error.message}`);
+         toast.error(`Failed to save certificate: ${error.message}`);
     } finally {
       setIsSaving(false);
     }

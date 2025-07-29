@@ -2,6 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { useState } from "react";
 import CreateHackathon from "../Create-hackathon";
 import { X } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function HackathonEditModal({ hackathon, onClose, onUpdated }) {
   // Handler for updating hackathon
@@ -17,14 +18,14 @@ export default function HackathonEditModal({ hackathon, onClose, onUpdated }) {
         body: JSON.stringify(formData),
       });
       if (res.ok) {
-        alert("Hackathon updated successfully!");
+          toast.success("Hackathon updated successfully!");
         onUpdated && onUpdated();
         onClose && onClose();
       } else {
-        alert("Failed to update hackathon. Please try again.");
+        toast.error("Failed to update hackathon. Please try again.");
       }
     } catch (err) {
-      alert("Error updating hackathon: " + err.message);
+      toast.error("Error updating hackathon: " + err.message);
     }
   };
 

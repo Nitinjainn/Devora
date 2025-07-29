@@ -9,6 +9,7 @@ import { Textarea } from "../../../../components/CommonUI/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/CommonUI/card";
 import { Separator } from "../../../../components/CommonUI/separator";
 import { Plus, Trash2, ArrowLeft, Save, FileText, HelpCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function CustomSubmissionForm({ hackathon, onCancel }) {
   const [questions, setQuestions] = useState([]);
@@ -54,12 +55,12 @@ export default function CustomSubmissionForm({ hackathon, onCancel }) {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert("✅ Submission form saved successfully!");
+         toast.success("Submission form saved successfully!");
       setQuestions([]);
       setTerms([]);
     } catch (err) {
       console.error("Save form error:", err);
-      alert("❌ Failed to save form. Try again.");
+        toast.error("Failed to save form. Try again.");
     } finally {
       setIsLoading(false);
     }
