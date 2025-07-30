@@ -17,7 +17,6 @@ import HorizontalTabNav from "./HackathonComponent/Hackathon/HorizontalTabNav";
 import HackathonProjectsGallery from "./HackathonComponent/Hackathon/HackathonProjectsGallery";
 import TeamManagementSection from "./HackathonComponent/Hackathon/TeamManagementSection";
 import ShortlistedParticipants from "./HackathonComponent/Hackathon/ShortlistedParticipants";
-import WinnersDisplay from "./HackathonComponent/Hackathon/WinnersDisplay";
 import BaseModal from "./HackathonComponent/Hackathon/TeamModals/BaseModal";
 import { fetchHackathonParticipants } from "../../../../lib/api";
 import {
@@ -72,7 +71,6 @@ export function HackathonDetails({ hackathon: propHackathon, onBack, backButtonL
       { id: "community", label: "Community" },
       { id: "projects", label: "Project Gallery" },
       ...(hasShortlisted ? [{ id: "shortlisted", label: `Shortlisted Participants (${shortlistedCount})` }] : []),
-      ...(hasWinners ? [{ id: "winners", label: `🏆 Winners (${winnersCount})` }] : []),
     ];
     console.log('🔍 Final sections array:', sectionsArray);
     return sectionsArray;
@@ -536,11 +534,6 @@ export function HackathonDetails({ hackathon: propHackathon, onBack, backButtonL
               {hasShortlisted && (
                 <div ref={sectionRefs.shortlisted} id="shortlisted" className="py-8 border-b">
                   <ShortlistedParticipants hackathonId={hackathon._id} roundIndex={shortlistedRoundIndex} />
-                </div>
-              )}
-              {hasWinners && (
-                <div ref={sectionRefs.winners} id="winners" className="py-8 border-b">
-                  <WinnersDisplay hackathonId={hackathon._id} />
                 </div>
               )}
                <div className="py-8 mt-10 text-center border-t border-gray-200/75">
