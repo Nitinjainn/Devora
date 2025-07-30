@@ -203,4 +203,4 @@ export default function HackathonOverview({ hackathon, sectionRef, user, onShowP
       </Card>
     </section>
   );
-}
+} 
