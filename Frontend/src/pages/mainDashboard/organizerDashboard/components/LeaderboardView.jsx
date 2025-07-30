@@ -1824,7 +1824,7 @@ if (loading) {
                             <span className="w-4 h-4 bg-green-200 text-green-700 rounded-full flex items-center justify-center text-xs font-bold">
                               ✓
                             </span>
-                            <span className="font-medium">{entry.projectTitle}</span>
+                            <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                             <span className="text-green-600">({entry.averageScore}/10)</span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
@@ -2112,7 +2112,7 @@ if (loading) {
                             <span className="w-4 h-4 bg-green-200 text-green-700 rounded-full flex items-center justify-center text-xs font-bold">
                               ✓
                             </span>
-                            <span className="font-medium">{entry.projectTitle}</span>
+                            <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                             <span className="text-green-600">({entry.averageScore}/10)</span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
@@ -2139,7 +2139,7 @@ if (loading) {
                             <span className="w-4 h-4 bg-green-200 text-green-700 rounded-full flex items-center justify-center text-xs font-bold">
                               ✓
                             </span>
-                            <span className="font-medium">{entry.projectTitle}</span>
+                            <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                             <span className="text-green-600">({entry.averageScore}/10)</span>
                           </div>
                         ))}
@@ -2205,7 +2205,7 @@ if (loading) {
               {/* Submission Details */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-900 mb-2">
-                  {selectedEntryForEdit.projectTitle || 'Untitled Project'}
+                  {selectedEntryForEdit.teamName || selectedEntryForEdit.team?.name || selectedEntryForEdit.projectTitle || 'Untitled Project'}
                 </h3>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p><strong>Team:</strong> {selectedEntryForEdit.teamName}</p>
@@ -2501,7 +2501,7 @@ if (loading) {
                           }}
                           className="text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="font-medium">{entry.projectTitle}</span>
+                        <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                         <span className="text-gray-500">({entry.averageScore}/10)</span>
                       </div>
                       <span className="text-sm text-gray-500">
@@ -2527,7 +2527,7 @@ if (loading) {
                     .slice(0, winnerMode === 'topN' ? winnerCount : undefined)
                     .map((entry, idx) => (
                       <div key={entry._id} className="flex items-center gap-2 mb-2">
-                        <span className="font-medium w-48 truncate">{entry.projectTitle}</span>
+                        <span className="font-medium w-48 truncate">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                         <select
                           value={winnerProblemStatementMap[entry._id] || 'All'}
                           onChange={e => setWinnerProblemStatementMap(prev => ({ ...prev, [entry._id]: e.target.value }))}
@@ -2551,7 +2551,7 @@ if (loading) {
                     if (!entry) return null;
                     return (
                       <div key={id} className="flex items-center gap-2 mb-2">
-                        <span className="font-medium w-48 truncate">{entry.projectTitle}</span>
+                        <span className="font-medium w-48 truncate">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                         <select
                           value={winnerProblemStatementMap[id] || 'All'}
                           onChange={e => setWinnerProblemStatementMap(prev => ({ ...prev, [id]: e.target.value }))}
@@ -2591,7 +2591,7 @@ if (loading) {
                         .map((entry, index) => (
                           <div key={entry._id} className="flex items-center gap-2 text-xs">
                             <Star className="w-4 h-4 text-yellow-600" />
-                            <span className="font-medium">{entry.projectTitle}</span>
+                            <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                             <span className="text-yellow-600">({entry.averageScore}/10)</span>
                             <span className="text-xs text-gray-500">#{index + 1}</span>
                           </div>
@@ -2611,7 +2611,7 @@ if (loading) {
                         .map((entry, index) => (
                           <div key={entry._id} className="flex items-center gap-2 text-xs">
                             <Star className="w-4 h-4 text-yellow-600" />
-                            <span className="font-medium">{entry.projectTitle}</span>
+                            <span className="font-medium">{entry.teamName || entry.team?.name || entry.projectTitle}</span>
                             <span className="text-yellow-600">({entry.averageScore}/10)</span>
                           </div>
                         ))}

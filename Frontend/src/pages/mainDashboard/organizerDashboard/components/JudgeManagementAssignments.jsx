@@ -1213,13 +1213,15 @@ export default function JudgeManagementAssignments({
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leader</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem Statement</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Judge</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
                     </tr>
                   </thead>
                   <tbody>
                     {teamsToShow.length === 0 ? (
-                      <tr><td colSpan={6} className="text-center py-8 text-gray-400">No teams found.</td></tr>
+                      <tr><td colSpan={8} className="text-center py-8 text-gray-400">No teams found.</td></tr>
                     ) : teamsToShow.map((team, idx) => (
                       <tr key={team._id} className="border-b hover:bg-indigo-50 transition-all">
                         <td className="px-6 py-4 font-medium">{idx + 1}</td>
@@ -1240,6 +1242,69 @@ export default function JudgeManagementAssignments({
                         </td>
                         <td className="px-6 py-4">
                           <span className="text-sm text-gray-600">{team.leader?.email}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {(() => {
+                              // Find submissions for this team
+                              const teamSubmissions = submissions.filter(sub => 
+                                sub.teamId === team._id || 
+                                sub.teamName === team.name ||
+                                sub.submittedBy?.teamId === team._id
+                              );
+                              
+                              if (teamSubmissions.length > 0) {
+                                const problemStatements = teamSubmissions
+                                  .map(sub => sub.problemStatement)
+                                  .filter(ps => ps)
+                                  .map(ps => getProblemStatementText(ps));
+                                
+                                const uniquePS = [...new Set(problemStatements)];
+                                
+                                if (uniquePS.length > 0) {
+                                  return (
+                                    <div className="space-y-1">
+                                      {uniquePS.map((ps, idx) => (
+                                        <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                          {ps.length > 25 ? ps.substring(0, 25) + "..." : ps}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  );
+                                }
+                              }
+                              return <span className="text-gray-400 text-sm">Not specified</span>;
+                            })()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {(() => {
+                              // Find judge assignments for this team
+                              const teamJudgeAssignments = allJudgeAssignments.filter(assignment => {
+                                // Check if this judge is assigned to any submission from this team
+                                const assignedSubmissions = assignment.assignedSubmissions || [];
+                                return assignedSubmissions.some(sub => 
+                                  sub.teamId === team._id || 
+                                  sub.teamName === team.name ||
+                                  sub.submittedBy?.teamId === team._id
+                                );
+                              });
+                              
+                              if (teamJudgeAssignments.length > 0) {
+                                return (
+                                  <div className="space-y-1">
+                                    {teamJudgeAssignments.map((assignment, idx) => (
+                                      <span key={idx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {assignment.judge?.email || assignment.judge?.name || 'Unknown Judge'}
+                                      </span>
+                                    ))}
+                                  </div>
+                                );
+                              }
+                              return <span className="text-gray-400 text-sm">No judge assigned</span>;
+                            })()}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
