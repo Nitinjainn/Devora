@@ -355,9 +355,7 @@ export default function CreatedHackathonViews({
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
-                        {selectedProblemStatement !== 'All' && (
-                          <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem Statement</th>
-                        )}
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem Statement</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
@@ -384,21 +382,19 @@ export default function CreatedHackathonViews({
                               <span className="text-gray-400 text-sm">Individual</span>
                             )}
                           </td>
-                          {selectedProblemStatement !== 'All' && (
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {p.submittedProblemStatements && p.submittedProblemStatements.length > 0 ? (
-                                <div className="space-y-1">
-                                  {p.submittedProblemStatements.map((ps, psIdx) => (
-                                    <span key={psIdx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                      {getProblemStatementText(ps).length > 30 ? getProblemStatementText(ps).substring(0, 30) + "..." : getProblemStatementText(ps)}
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-gray-400 text-sm">No submission</span>
-                              )}
-                            </td>
-                          )}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {p.submittedProblemStatements && p.submittedProblemStatements.length > 0 ? (
+                              <div className="space-y-1">
+                                {p.submittedProblemStatements.map((ps, psIdx) => (
+                                  <span key={psIdx} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {getProblemStatementText(ps).length > 30 ? getProblemStatementText(ps).substring(0, 30) + "..." : getProblemStatementText(ps)}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-sm">No submission</span>
+                            )}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {p.hasSubmitted ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -705,7 +701,7 @@ export default function CreatedHackathonViews({
                         +{team.members.length - 3} more members
                               </div>
                             )}
-                    {selectedTeamProblemStatement !== 'All' && team.submittedProblemStatements && team.submittedProblemStatements.length > 0 && (
+                    {team.submittedProblemStatements && team.submittedProblemStatements.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-gray-100">
                         <div className="text-xs text-gray-500 mb-1">Problem Statements:</div>
                         <div className="space-y-1">

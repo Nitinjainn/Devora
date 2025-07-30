@@ -643,6 +643,7 @@ export default function JudgeManagementAssignments({
                           <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TEAM</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROJECT</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROBLEM STATEMENT</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROUND</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ASSIGNED JUDGES</th>
@@ -662,6 +663,26 @@ export default function JudgeManagementAssignments({
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
                                   {submission.projectTitle || submission.title || 'Untitled Project'}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">
+                                  {submission.problemStatement ? (
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                      {typeof submission.problemStatement === 'string' 
+                                        ? (submission.problemStatement.length > 30 
+                                            ? submission.problemStatement.substring(0, 30) + "..." 
+                                            : submission.problemStatement)
+                                        : submission.problemStatement.statement 
+                                          ? (submission.problemStatement.statement.length > 30 
+                                              ? submission.problemStatement.statement.substring(0, 30) + "..." 
+                                              : submission.problemStatement.statement)
+                                          : 'Not specified'
+                                      }
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">Not specified</span>
+                                  )}
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
@@ -756,6 +777,7 @@ export default function JudgeManagementAssignments({
                                />
                              </th>
                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TEAM</th>
+                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROBLEM STATEMENT</th>
                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE</th>
                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
                            </tr>
@@ -775,6 +797,26 @@ export default function JudgeManagementAssignments({
                                  <div>
                                    <div className="font-medium text-gray-900">{submission.teamName}</div>
                                    <div className="text-sm text-gray-500">{submission.teamId}</div>
+                                 </div>
+                               </td>
+                               <td className="px-6 py-4 whitespace-nowrap">
+                                 <div className="text-sm text-gray-900">
+                                   {submission.problemStatement ? (
+                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                       {typeof submission.problemStatement === 'string' 
+                                         ? (submission.problemStatement.length > 30 
+                                             ? submission.problemStatement.substring(0, 30) + "..." 
+                                             : submission.problemStatement)
+                                         : submission.problemStatement.statement 
+                                           ? (submission.problemStatement.statement.length > 30 
+                                               ? submission.problemStatement.statement.substring(0, 30) + "..." 
+                                               : submission.problemStatement.statement)
+                                           : 'Not specified'
+                                       }
+                                     </span>
+                                   ) : (
+                                     <span className="text-gray-400 text-sm">Not specified</span>
+                                   )}
                                  </div>
                                </td>
                                <td className="px-6 py-4 whitespace-nowrap">
@@ -859,13 +901,14 @@ export default function JudgeManagementAssignments({
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leader</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem Statement</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
                     </tr>
                   </thead>
                   <tbody>
                     {teamsToShow.length === 0 ? (
-                      <tr><td colSpan={5} className="text-center py-8 text-gray-400">No teams found.</td></tr>
+                      <tr><td colSpan={6} className="text-center py-8 text-gray-400">No teams found.</td></tr>
                     ) : teamsToShow.map((team, idx) => (
                       <tr key={team._id} className="border-b hover:bg-indigo-50 transition-all">
                         <td className="px-6 py-4 font-medium">{idx + 1}</td>
@@ -877,6 +920,26 @@ export default function JudgeManagementAssignments({
                         </td>
                         <td className="px-6 py-4">
                           <span className="font-medium text-gray-900">{team.leader?.name}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {team.submittedProblemStatements && team.submittedProblemStatements.length > 0 ? (
+                              <div className="space-y-1">
+                                {team.submittedProblemStatements.map((ps, psIdx) => (
+                                  <span key={psIdx} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {typeof ps === 'string' 
+                                      ? (ps.length > 25 ? ps.substring(0, 25) + "..." : ps)
+                                      : ps.statement 
+                                        ? (ps.statement.length > 25 ? ps.statement.substring(0, 25) + "..." : ps.statement)
+                                        : 'Not specified'
+                                    }
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-sm">Not specified</span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
@@ -1004,6 +1067,7 @@ export default function JudgeManagementAssignments({
                           <thead className="bg-gray-50">
                             <tr>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TEAM</th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROBLEM STATEMENT</th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TYPE</th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ASSIGNED JUDGES</th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SCORE</th>
@@ -1017,6 +1081,26 @@ export default function JudgeManagementAssignments({
                                   <div>
                                     <div className="font-medium text-gray-900">{submission.teamName}</div>
                                     <div className="text-sm text-gray-500">{submission.teamId}</div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="text-sm text-gray-900">
+                                    {submission.problemStatement ? (
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        {typeof submission.problemStatement === 'string' 
+                                          ? (submission.problemStatement.length > 30 
+                                              ? submission.problemStatement.substring(0, 30) + "..." 
+                                              : submission.problemStatement)
+                                          : submission.problemStatement.statement 
+                                            ? (submission.problemStatement.statement.length > 30 
+                                                ? submission.problemStatement.statement.substring(0, 30) + "..." 
+                                                : submission.problemStatement.statement)
+                                            : 'Not specified'
+                                        }
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400 text-sm">Not specified</span>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
