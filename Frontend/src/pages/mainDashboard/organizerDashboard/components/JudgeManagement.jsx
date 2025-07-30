@@ -679,7 +679,7 @@ export default function JudgeManagement({ hackathonId, hideHackathonSelector = f
               </TabsList>
 
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6 p-6">
+              <TabsContent value="overview" className="space-y-6 p-2">
                 <JudgeManagementOverview
                   summary={summary}
                   hackathon={hackathon}
@@ -693,7 +693,7 @@ export default function JudgeManagement({ hackathonId, hideHackathonSelector = f
               </TabsContent>
 
               {/* Problem Statements Tab */}
-              <TabsContent value="problem-statements" className="space-y-6 p-6">
+              <TabsContent value="problem-statements" className="space-y-6 p-2">
                 <JudgeManagementProblemStatements
                   hackathon={hackathon}
                   onEdit={(updatedPS, idx) => {
@@ -716,7 +716,7 @@ export default function JudgeManagement({ hackathonId, hideHackathonSelector = f
               </TabsContent>
 
               {/* Judges Tab */}
-              <TabsContent value="judges" className="space-y-6 p-6">
+              <TabsContent value="judges" className="space-y-6 p-2">
                 <JudgeManagementJudges
                   judgeAssignments={judgeAssignments}
                   getJudgeTypeIcon={getJudgeTypeIcon}
@@ -728,7 +728,7 @@ export default function JudgeManagement({ hackathonId, hideHackathonSelector = f
               </TabsContent>
 
               {/* Assignments Tab - Card-based UI */}
-              <TabsContent value="assignments" className="space-y-6 p-6">
+              <TabsContent value="assignments" className="space-y-6 p-2">
                 {(hackathon && (hackathon._id || hackathon.id)) ? (
                   <JudgeManagementAssignments
                     key={selectedHackathonId}
@@ -744,7 +744,7 @@ export default function JudgeManagement({ hackathonId, hideHackathonSelector = f
               </TabsContent>
 
               {/* Leaderboard Tab */}
-              <TabsContent value="leaderboard" className="space-y-6 p-6">
+              <TabsContent value="leaderboard" className="space-y-6 p-2">
                 {(hackathon && (hackathon._id || hackathon.id)) ? (
                   <LeaderboardView
                     hackathonId={hackathon._id || hackathon.id}

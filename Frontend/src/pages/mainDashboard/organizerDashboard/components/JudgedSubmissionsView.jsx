@@ -1,17 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../../../../components/CommonUI/button";
 import { Card, CardHeader, CardTitle, CardContent } from "../../../../components/CommonUI/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/CommonUI/select";
 import { Badge } from "../../../../components/CommonUI/badge";
+import { FilterSidebar, FilterField, FilterToggleButton } from "../../../../components/CommonUI/FilterSidebar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/CommonUI/select";
 import { 
   Gavel, 
   TrendingUp, 
-  Filter,
   Download,
-  RefreshCw,
   FileText,
   Users,
-  Trophy,
   Star
 } from "lucide-react";
 
@@ -24,6 +22,8 @@ export default function JudgedSubmissionsView({
   selectedProblemStatement = 'All',
   setSelectedProblemStatement = () => {},
 }) {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   // Helper function to extract problem statement text
   const getProblemStatementText = (ps) => {
     if (typeof ps === 'string') return ps;
@@ -143,8 +143,50 @@ export default function JudgedSubmissionsView({
       }, 0) / filteredSubmissions.length).toFixed(2)
     : "N/A";
 
+  // Export function
+  const handleExport = () => {
+    const csvContent = [
+      ['Team Name', 'Problem Statement', 'Judge', 'Average Score', 'Round', 'Feedback'],
+      ...filteredSubmissions.map(s => {
+        let avgScore = "N/A";
+        if (s.scores) {
+          const vals = Object.values(s.scores);
+          if (vals.length > 0) {
+            avgScore = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+          }
+        }
+        return [
+          s.team?.name || (s.team?.members ? s.team.members.map(m => m.name || m.email).join(", ") : "Unknown Team"),
+          getProblemStatementText(s.problemStatement) || "N/A",
+          s.judge?.name || s.judge?.email || "Unknown Judge",
+          avgScore,
+          `Round ${getSubmissionRound(s)}`,
+          s.feedback || "No feedback provided"
+        ];
+      })
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `judged-submissions-${selectedRound === 'All' ? 'all' : selectedRound.toLowerCase()}-${selectedProblemStatement === 'All' ? 'all' : 'filtered'}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Clear filters function
+  const handleClearFilters = () => {
+    setSelectedRound('All');
+    setSelectedProblemStatement('All');
+  };
+
+  // Check if filters are active
+  const hasActiveFilters = selectedRound !== 'All' || selectedProblemStatement !== 'All';
+  const activeFiltersCount = (selectedRound !== 'All' ? 1 : 0) + (selectedProblemStatement !== 'All' ? 1 : 0);
+
   return (
-    <Card className="shadow-none hover:shadow-none">
+    <div className="">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-3 text-xl">
@@ -152,104 +194,54 @@ export default function JudgedSubmissionsView({
               <Gavel className="w-6 h-6 text-purple-600" />
             </div>
             Judged Submissions
-            
           </CardTitle>
           
-          {/* Filters */}
-          <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
-            <Filter className="w-4 h-4 text-gray-500" />
-            
-            {/* Round Filter */}
-            <span className="text-sm font-medium text-gray-500">Round:</span>
-            <Select value={selectedRound} onValueChange={setSelectedRound}>
-              <SelectTrigger className="w-40 bg-white">
-                <SelectValue placeholder="All Rounds" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Rounds ({totalSubmissions})</SelectItem>
-                <SelectItem value="Round 1">Round 1 ({round1Submissions})</SelectItem>
-                <SelectItem value="Round 2">Round 2 ({round2Submissions})</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Problem Statement Filter */}
-            <span className="text-sm font-medium text-gray-500">Problem Statement:</span>
-            <Select value={selectedProblemStatement} onValueChange={setSelectedProblemStatement}>
-              <SelectTrigger className="w-64 bg-white">
-                <SelectValue placeholder="All Problem Statements" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Problem Statements ({filteredSubmissionsCount})</SelectItem>
-                {uniqueProblemStatements.map((ps, idx) => (
-                  <SelectItem key={idx} value={ps}>
-                    {ps.length > 50 ? ps.substring(0, 50) + "..." : ps} ({getProblemStatementCount(ps)})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Clear Filters */}
-            {(selectedRound !== 'All' || selectedProblemStatement !== 'All') && (
-              <Button
-                variant="outline"
-                size="default"
-                onClick={() => {
-                  setSelectedRound('All');
-                  setSelectedProblemStatement('All');
-                }}
-                className="text-gray-700 hover:text-gray-900 border-gray-400 hover:border-gray-500 bg-white hover:bg-gray-50 px-10 py-2 font-medium"
-              >
-                Clear Filters
-              </Button>
+          {/* Filter and Export Actions */}
+          <div className="flex items-center gap-3">
+            {/* Active Filters Display */}
+            {hasActiveFilters && (
+              <div className="flex items-center gap-2">
+                {selectedRound !== 'All' && (
+                  <Badge variant="secondary" className="bg-indigo-100 text-indigo-800">
+                    {selectedRound}
+                  </Badge>
+                )}
+                {selectedProblemStatement !== 'All' && (
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                    {selectedProblemStatement.length > 20 
+                      ? selectedProblemStatement.substring(0, 20) + "..." 
+                      : selectedProblemStatement}
+                  </Badge>
+                )}
+                <span className="text-sm text-gray-500">
+                  {filteredSubmissionsCount} of {totalSubmissions}
+                </span>
+              </div>
             )}
+
+            {/* Filter Toggle Button */}
+            <FilterToggleButton
+              onClick={() => setIsFilterOpen(true)}
+              hasActiveFilters={hasActiveFilters}
+              activeFiltersCount={activeFiltersCount}
+            />
 
             {/* Export Button */}
             <Button
-              variant="outline"
-              size="default"
-              onClick={() => {
-                // Export judged submissions functionality
-                const csvContent = [
-                  ['Team Name', 'Problem Statement', 'Judge', 'Average Score', 'Round', 'Feedback'],
-                  ...filteredSubmissions.map(s => {
-                    let avgScore = "N/A";
-                    if (s.scores) {
-                      const vals = Object.values(s.scores);
-                      if (vals.length > 0) {
-                        avgScore = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
-                      }
-                    }
-                    return [
-                      s.team?.name || (s.team?.members ? s.team.members.map(m => m.name || m.email).join(", ") : "Unknown Team"),
-                      getProblemStatementText(s.problemStatement) || "N/A",
-                      s.judge?.name || s.judge?.email || "Unknown Judge",
-                      avgScore,
-                      `Round ${getSubmissionRound(s)}`,
-                      s.feedback || "No feedback provided"
-                    ];
-                  })
-                ].map(row => row.join(',')).join('\n');
-                
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `judged-submissions-${selectedRound === 'All' ? 'all' : selectedRound.toLowerCase()}-${selectedProblemStatement === 'All' ? 'all' : 'filtered'}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-              }}
-              className="text-gray-700 hover:text-gray-900 border-gray-400 hover:border-gray-500 bg-white hover:bg-gray-50 px-4 py-1 font-medium"
+              variant="blue"
+              onClick={handleExport}
+              className="flex items-center gap-2 h-12 px-6"
             >
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4" />
               Export
             </Button>
-
-        
-            
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      
+      <hr />
+      
+      <CardContent className="pt-4">
         {filteredSubmissions.length === 0 ? (
           <div className="text-center py-16">
             <div className="p-4 bg-gray-100 rounded-full mb-4 w-20 h-20 flex items-center justify-center mx-auto">
@@ -267,7 +259,7 @@ export default function JudgedSubmissionsView({
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-6">
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden shadow-none hover:shadow-none">
                 <CardContent className="p-6 pt-6">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-purple-50 rounded-xl">
@@ -276,14 +268,14 @@ export default function JudgedSubmissionsView({
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{filteredSubmissionsCount}</div>
                       <div className="text-sm text-gray-500">
-                        {selectedRound !== 'All' || selectedProblemStatement !== 'All' ? 'Filtered Submissions' : 'Total Judged'}
+                        {hasActiveFilters ? 'Filtered Submissions' : 'Total Judged'}
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden shadow-none hover:shadow-none">
                 <CardContent className="p-6 pt-6">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-green-50 rounded-xl">
@@ -297,7 +289,7 @@ export default function JudgedSubmissionsView({
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden shadow-none hover:shadow-none">
                 <CardContent className="p-6 pt-6">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-50 rounded-xl">
@@ -313,7 +305,7 @@ export default function JudgedSubmissionsView({
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden">
+              <Card className="overflow-hidden shadow-none hover:shadow-none">
                 <CardContent className="p-6 pt-6">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-orange-50 rounded-xl">
@@ -331,7 +323,7 @@ export default function JudgedSubmissionsView({
             </div>
 
             {/* Submissions Table */}
-            <div className="overflow-hidden rounded-xl border border-gray-200">
+            <div className="overflow-hidden rounded-xl">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
@@ -342,7 +334,7 @@ export default function JudgedSubmissionsView({
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Problem Statement
                       </th>
-                      {selectedRound !== 'All' && (
+                      {selectedRound === 'All' && (
                         <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Round
                         </th>
@@ -374,7 +366,7 @@ export default function JudgedSubmissionsView({
                         <tr key={score._id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3">
                                 {(score.team?.name || 'T')[0].toUpperCase()}
                               </div>
                               <div>
@@ -389,7 +381,7 @@ export default function JudgedSubmissionsView({
                               {getProblemStatementText(score.problemStatement) || "N/A"}
                             </div>
                           </td>
-                          {selectedRound !== 'All' && (
+                          {selectedRound === 'All' && (
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 getSubmissionRound(score) === 1 
@@ -449,6 +441,68 @@ export default function JudgedSubmissionsView({
           </>
         )}
       </CardContent>
-    </Card>
+
+      {/* Filter Sidebar */}
+      <FilterSidebar
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        title="Filter Submissions"
+        hasActiveFilters={hasActiveFilters}
+        onClearAll={handleClearFilters}
+        showApplyButton={true}
+      >
+        {/* Round Filter */}
+        <FilterField label="Round">
+          <Select value={selectedRound} onValueChange={setSelectedRound}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Round" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Rounds ({totalSubmissions})</SelectItem>
+              <SelectItem value="Round 1">Round 1 ({round1Submissions})</SelectItem>
+              <SelectItem value="Round 2">Round 2 ({round2Submissions})</SelectItem>
+            </SelectContent>
+          </Select>
+        </FilterField>
+
+        {/* Problem Statement Filter */}
+        <FilterField label="Problem Statement">
+          <Select value={selectedProblemStatement} onValueChange={setSelectedProblemStatement}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Problem Statement" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All Problem Statements</SelectItem>
+              {uniqueProblemStatements.map((ps, idx) => (
+                <SelectItem key={idx} value={ps}>
+                  {ps.length > 40 ? ps.substring(0, 40) + "..." : ps} ({getProblemStatementCount(ps)})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </FilterField>
+
+        {/* Filter Statistics */}
+        <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+          <h4 className="font-medium text-gray-900 text-sm">Filter Results</h4>
+          <div className="text-sm text-gray-600 space-y-1">
+            <div className="flex justify-between">
+              <span>Total Submissions:</span>
+              <span className="font-medium">{totalSubmissions}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Filtered Results:</span>
+              <span className="font-medium text-indigo-600">{filteredSubmissionsCount}</span>
+            </div>
+            {averageScore !== "N/A" && (
+              <div className="flex justify-between">
+                <span>Average Score:</span>
+                <span className="font-medium">{averageScore}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </FilterSidebar>
+    </div>
   );
-} 
+}

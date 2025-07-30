@@ -176,10 +176,7 @@ export default function JudgeManagementOverview({
       {/* Enhanced Judged Submissions */}
       <section>
         <Card className="shadow-none hover:shadow-none">
-          <CardHeader className="pb-4">
-            
-          </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="pt-4">
             <JudgedSubmissionsView
               judgedSubmissions={judgedSubmissions}
               hackathon={hackathon}
