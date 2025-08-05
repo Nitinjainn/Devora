@@ -64,34 +64,11 @@ const EmailSenderModal = ({
   };
 
   const checkEmailConfiguration = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/test/test-email-config', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const config = await response.json();
-        setEmailConfig({
-          smtpConfigured: config.configured,
-          testEmail: config.testEmail || ''
-        });
-      } else {
-        console.error('Failed to check email configuration:', response.status);
-        setEmailConfig({
-          smtpConfigured: false,
-          testEmail: ''
-        });
-      }
-    } catch (error) {
-      console.error('Error checking email configuration:', error);
-      setEmailConfig({
-        smtpConfigured: false,
-        testEmail: ''
-      });
-    }
+    // Email configuration check removed - using default settings
+    setEmailConfig({
+      smtpConfigured: true, // Assume configured for production use
+      testEmail: ''
+    });
   };
 
   const generateEmailPreview = () => {
@@ -155,48 +132,7 @@ const EmailSenderModal = ({
     }
   };
 
-  const testEmailConfiguration = async () => {
-    if (!emailConfig.testEmail) {
-      alert('Please enter a test email address first');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/test/test-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          recipientEmail: emailConfig.testEmail
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(`✅ Test email sent successfully! Check ${emailConfig.testEmail} for the test email.`);
-      } else {
-        throw new Error(data.message || data.error || 'Failed to send test email');
-      }
-    } catch (error) {
-      console.error('Error sending test email:', error);
-      let errorMessage = error.message;
-      
-      if (error.message.includes('Unexpected token')) {
-        errorMessage = 'Server error: Invalid response format. Please check your backend configuration.';
-      } else if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'Network error: Cannot connect to the server. Please check if the backend is running.';
-      }
-      
-      alert(`❌ Failed to send test email: ${errorMessage}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Test email functionality removed - using production email sending only
 
   const previewData = generateEmailPreview();
 

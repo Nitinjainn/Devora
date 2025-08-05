@@ -1432,13 +1432,16 @@ if (loading) {
 
       {/* View Submission Modal */}
       <Dialog open={viewSubmissionModalOpen} onOpenChange={setViewSubmissionModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="submission-details-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-blue-600" />
               Submission Details
             </DialogTitle>
           </DialogHeader>
+          <div id="submission-details-description" className="sr-only">
+            Modal showing detailed information about a specific submission including files, evaluations, and scores
+          </div>
           {loadingSubmissionDetails ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -1666,13 +1669,16 @@ if (loading) {
 
       {/* Shortlist Modal */}
       <Dialog open={shortlistModalOpen} onOpenChange={setShortlistModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg" aria-describedby="shortlist-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-600" />
               Shortlist for Round 2
             </DialogTitle>
           </DialogHeader>
+          <div id="shortlist-modal-description" className="sr-only">
+            Modal for configuring shortlisting settings to select participants for Round 2
+          </div>
           <div className="space-y-4">
             {/* Shortlisting Mode Selection */}
             <div>
@@ -1933,13 +1939,16 @@ if (loading) {
 
       {/* Bulk Edit Shortlist Modal */}
       <Dialog open={editShortlistModalOpen} onOpenChange={setEditShortlistModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg" aria-describedby="edit-shortlist-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               Edit Shortlisting Method
             </DialogTitle>
           </DialogHeader>
+          <div id="edit-shortlist-modal-description" className="sr-only">
+            Modal for editing the shortlisting method and criteria for Round 2 selection
+          </div>
           <div className="space-y-4">
             {/* Previous Method Info */}
             {previousShortlistMode && (
@@ -2193,13 +2202,16 @@ if (loading) {
 
       {/* Individual Edit Shortlist Modal */}
       <Dialog open={individualEditModalOpen} onOpenChange={setIndividualEditModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby="individual-edit-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               Edit Submission Shortlist Status
             </DialogTitle>
           </DialogHeader>
+          <div id="individual-edit-modal-description" className="sr-only">
+            Modal for editing individual submission shortlist status
+          </div>
           {selectedEntryForEdit && (
             <div className="space-y-4">
               {/* Submission Details */}
@@ -2287,13 +2299,16 @@ if (loading) {
 
       {/* Edit All Shortlist Modal */}
       <Dialog open={editAllShortlistModalOpen} onOpenChange={setEditAllShortlistModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="edit-all-shortlist-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-purple-600" />
               Edit Shortlisted Submissions
             </DialogTitle>
           </DialogHeader>
+          <div id="edit-all-shortlist-modal-description" className="sr-only">
+            Modal for managing all shortlisted submissions for Round 2
+          </div>
           {loadingShortlisted ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -2395,13 +2410,16 @@ if (loading) {
 
       {/* Winner Assignment Modal */}
       <Dialog open={winnerAssignmentModalOpen} onOpenChange={setWinnerAssignmentModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="winner-assignment-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="w-5 h-5 text-yellow-600" />
               Assign Winners for Round 2
             </DialogTitle>
           </DialogHeader>
+          <div id="winner-assignment-modal-description" className="sr-only">
+            Modal for assigning winners based on different selection criteria
+          </div>
           <div className="space-y-6">
             {/* Winner Selection Mode */}
             <div>
@@ -2723,7 +2741,7 @@ if (loading) {
 
       {/* Winners Display Modal */}
       <Dialog open={winnersDisplayModalOpen} onOpenChange={setWinnersDisplayModalOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto" aria-describedby="winners-display-modal-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-600" />
@@ -2733,6 +2751,9 @@ if (loading) {
               View detailed information about the winners including their scores, team details, and performance breakdown.
             </DialogDescription>
           </DialogHeader>
+          <div id="winners-display-modal-description" className="sr-only">
+            Modal displaying detailed information about Round 2 winners including scores and team details
+          </div>
           {loadingWinners ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600"></div>
