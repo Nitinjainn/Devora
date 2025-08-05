@@ -1983,15 +1983,15 @@ export function ProfileSection({ viewUserId }) {
 
   const renderPrivacySecurity = () => (
     <div className="w-full flex flex-col gap-6">
-      {/* Password Section */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Password & Authentication</CardTitle>
-          <CardDescription>Manage your login credentials</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {/* Show Current Password only if registered via email */}
-          {user?.authProvider === "email" && (
+      {/* Password Section - Only show for email users */}
+      {user?.authProvider === "email" && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Password & Authentication</CardTitle>
+            <CardDescription>Manage your login credentials</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {/* Show Current Password only if registered via email */}
             <div className="relative">
               <Label htmlFor="current-password">Current Password</Label>
               <Input
@@ -2016,113 +2016,113 @@ export function ProfileSection({ viewUserId }) {
                 )}
               </button>
             </div>
-          )}
 
-          {/* New Password */}
-          <div className="relative">
-            <Label htmlFor="new-password">New Password</Label>
-            <Input
-              id="new-password"
-              type={showNewPassword ? "text" : "password"}
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="pr-10"
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none"
-              style={{ top: "32px" }}
-              onClick={() => setShowNewPassword(!showNewPassword)}
-            >
-              {showNewPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-
-          {/* Confirm New Password */}
-          <div className="relative">
-            <Label htmlFor="confirm-password">Confirm New Password</Label>
-            <Input
-              id="confirm-password"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pr-10"
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none"
-              style={{ top: "32px" }}
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-
-          {/* Error and Success Messages */}
-          {passwordError && (
-            <div className="p-4 bg-red-100 border-2 border-red-500 rounded-lg flex items-center gap-2 mt-2">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* New Password */}
+            <div className="relative">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none"
+                style={{ top: "32px" }}
+                onClick={() => setShowNewPassword(!showNewPassword)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0Z"
-                />
-              </svg>
-              <span className="text-red-700 font-bold text-base">
-                {passwordError}
-              </span>
+                {showNewPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
-          )}
 
-          {passwordMessage && (
-            <div className="p-4 bg-green-100 border-2 border-green-500 rounded-lg flex items-center gap-2 mt-2">
-              <svg
-                className="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* Confirm New Password */}
+            <div className="relative">
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none"
+                style={{ top: "32px" }}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              <span className="text-green-700 font-bold text-base">
-                {passwordMessage}
-              </span>
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
-          )}
 
-          <Button
-            className="flex items-center gap-2 w-full sm:w-auto"
-            onClick={handlePasswordUpdate}
-            variant="blue"
-          >
-            <Lock className="w-4 h-4" />
-            Update Password
-          </Button>
-        </CardContent>
-      </Card>
+            {/* Error and Success Messages */}
+            {passwordError && (
+              <div className="p-4 bg-red-100 border-2 border-red-500 rounded-lg flex items-center gap-2 mt-2">
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+                <span className="text-red-700 font-bold text-base">
+                  {passwordError}
+                </span>
+              </div>
+            )}
+
+            {passwordMessage && (
+              <div className="p-4 bg-green-100 border-2 border-green-500 rounded-lg flex items-center gap-2 mt-2">
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span className="text-green-700 font-bold text-base">
+                  {passwordMessage}
+                </span>
+              </div>
+            )}
+
+            <Button
+              className="flex items-center gap-2 w-full sm:w-auto"
+              onClick={handlePasswordUpdate}
+              variant="blue"
+            >
+              <Lock className="w-4 h-4" />
+              Update Password
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 2FA Section */}
       <Card className="w-full">
@@ -2428,6 +2428,9 @@ export function ProfileSection({ viewUserId }) {
     setPasswordMessage("");
     setPasswordError("");
 
+    console.log("User data from localStorage:", userData);
+    console.log("Token available:", !!token);
+
     if (!userData?._id || !token) {
       setPasswordError("Missing user session. Please re-login.");
       return;
@@ -2456,7 +2459,10 @@ export function ProfileSection({ viewUserId }) {
     }
 
     try {
-      await axios.put(
+      console.log("Updating password for user:", userData._id);
+      console.log("Request payload:", { currentPassword: !!currentPassword, newPassword: !!newPassword });
+      
+      const response = await axios.put(
         `http://localhost:3000/api/users/${userData._id}/password`,
         {
           currentPassword, // Optional if OAuth
@@ -2469,6 +2475,7 @@ export function ProfileSection({ viewUserId }) {
         }
       );
 
+      console.log("Password update response:", response.data);
       setPasswordMessage("Password updated successfully!");
       setCurrentPassword("");
       setNewPassword("");
@@ -2480,6 +2487,8 @@ export function ProfileSection({ viewUserId }) {
       // Clear success message after 3 seconds
       setTimeout(() => setPasswordMessage(""), 3000);
     } catch (err) {
+      console.error("Password update error:", err);
+      console.error("Error response:", err.response?.data);
       setPasswordError(
         err.response?.data?.message || "Error updating password"
       );

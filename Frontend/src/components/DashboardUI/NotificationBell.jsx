@@ -31,11 +31,17 @@ function NotificationBell() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data) {
+      // Ensure notifications is always an array
+      if (data && Array.isArray(data)) {
         setNotifications(data);
+      } else if (data && data.notifications && Array.isArray(data.notifications)) {
+        setNotifications(data.notifications);
+      } else {
+        setNotifications([]);
       }
     } catch (err) {
       console.error("Failed to fetch notifications:", err);
+      setNotifications([]);
     }
   };
 
@@ -72,7 +78,7 @@ function NotificationBell() {
     try {
       const token = localStorage.getItem("token");
       // Only mark user-specific notifications as read
-      const userNotifIds = notifications.filter(n => !n.read && !n.fromAnnouncement).map(n => n._id);
+      const userNotifIds = (notifications || []).filter(n => !n.read && !n.fromAnnouncement).map(n => n._id);
       await Promise.all(userNotifIds.map(id =>
         fetch(buildApiUrl(`/notifications/${id}/read`), {
           method: "PUT",
@@ -155,7 +161,7 @@ function NotificationBell() {
   const handleBellClick = () => setShowNotificationDropdown((open) => !open);
 
   // Filtering logic
-  const filteredNotifications = notifications.filter((n) => {
+  const filteredNotifications = (notifications || []).filter((n) => {
     // Only allow read/unread toggling for user-specific notifications
     if (n.fromAnnouncement) {
       // Announcements always show as unread
@@ -171,9 +177,9 @@ function NotificationBell() {
     <div className="relative" onMouseEnter={bellEnter} onMouseLeave={bellLeave}>
       <button onClick={handleBellClick}>
         <BellIcon className="w-6 h-6 text-[#1b0c3f]" />
-        {notifications.filter(n => !n.read).length > 0 && (
+        {(notifications || []).filter(n => !n.read).length > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-            {notifications.filter(n => !n.read).length}
+            {(notifications || []).filter(n => !n.read).length}
           </span>
         )}
       </button>

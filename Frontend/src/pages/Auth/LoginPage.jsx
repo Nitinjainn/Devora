@@ -336,14 +336,7 @@ export default function LoginPage() {
                   </div>
 
                   {/* Login via OTP */}
-                  <div className="text-left">
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto text-[#4F46E5] hover:text-[#4F46E5]/80 font-medium"
-                    >
-                      Login via OTP
-                    </Button>
-                  </div>
+                  
 
                   {/* Password Input */}
                   <div className="space-y-2 px-1">

@@ -198,11 +198,19 @@ export default function SignupPage() {
           errors.email = "Please use an official organization email address (not Gmail, Yahoo, etc).";
         }
       }
-      if (!formData.password.trim()) errors.password = "Password is required"
-      if (!formData.confirmPassword.trim())
-        errors.confirmPassword = "Please confirm your password"
-      if (formData.password !== formData.confirmPassword)
-        errors.confirmPassword = "Passwords do not match"
+      
+      // Check if user is OAuth (no password required) or email (password required)
+      const isOAuthUser = user?.authProvider && user.authProvider !== "email";
+      
+      if (!isOAuthUser) {
+        // Only validate passwords for non-OAuth users
+        if (!formData.password.trim()) errors.password = "Password is required"
+        if (!formData.confirmPassword.trim())
+          errors.confirmPassword = "Please confirm your password"
+        if (formData.password !== formData.confirmPassword)
+          errors.confirmPassword = "Passwords do not match"
+      }
+      
       if (!formData.phone.trim()) errors.phone = "Phone number is required"
       if (!formData.country.trim()) errors.country = "Country is required"
     }
@@ -414,12 +422,17 @@ export default function SignupPage() {
     }
 
     if (currentStep === 2) {
+      // Check if user is OAuth (no password required) or email (password required)
+      const isOAuthUser = user?.authProvider && user.authProvider !== "email";
+      
       return (
         <BasicInformationForm
           formData={formData}
           errors={validationErrors}
           onChange={handleInputChange}
           emailReadOnly={!!(user && user.email)}
+          isOAuthUser={isOAuthUser}
+          user={user}
         />
       )
     }
@@ -440,16 +453,26 @@ export default function SignupPage() {
     if (currentStep === 1) return selectedRole !== null
 
     if (currentStep === 2) {
-      return (
+      // Check if user is OAuth (no password required) or email (password required)
+      const isOAuthUser = user?.authProvider && user.authProvider !== "email";
+      
+      const basicFieldsValid = 
         formData.firstName.trim() !== "" &&
         formData.lastName.trim() !== "" &&
         formData.email.trim() !== "" &&
-        formData.password.trim() !== "" &&
-        formData.confirmPassword.trim() !== "" &&
         formData.phone.trim() !== "" &&
-        formData.country.trim() !== "" &&
-        formData.password === formData.confirmPassword
-      )
+        formData.country.trim() !== "";
+      
+      if (isOAuthUser) {
+        // For OAuth users, only check basic fields (no password required)
+        return basicFieldsValid;
+      } else {
+        // For email users, check password fields as well
+        return basicFieldsValid &&
+          formData.password.trim() !== "" &&
+          formData.confirmPassword.trim() !== "" &&
+          formData.password === formData.confirmPassword;
+      }
     }
 
     if (currentStep === 3) {

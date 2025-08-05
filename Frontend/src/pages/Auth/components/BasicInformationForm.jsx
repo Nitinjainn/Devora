@@ -2,7 +2,7 @@ import { Input } from "../../../components/CommonUI/input"
 import { Label } from "../../../components/CommonUI/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/CommonUI/select"
 
-export default function BasicInformationForm({ formData, errors, onChange, emailReadOnly }) {
+export default function BasicInformationForm({ formData, errors, onChange, emailReadOnly, isOAuthUser, user }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -80,42 +80,44 @@ export default function BasicInformationForm({ formData, errors, onChange, email
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="password" className="text-[#111827] font-medium">
-            Password *
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={e => onChange("password", e.target.value)}
-            className={`border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5] ${
-              errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
-            }`}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password}</p>
-          )}
+            {!isOAuthUser && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-[#111827] font-medium">
+              Password *
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={e => onChange("password", e.target.value)}
+              className={`border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5] ${
+                errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+              }`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-[#111827] font-medium">
+              Confirm Password *
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={e => onChange("confirmPassword", e.target.value)}
+              className={`border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5] ${
+                errors.confirmPassword ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
+              }`}
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+            )}
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-[#111827] font-medium">
-            Confirm Password *
-          </Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={e => onChange("confirmPassword", e.target.value)}
-            className={`border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5] ${
-              errors.confirmPassword ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""
-            }`}
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-          )}
-        </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">

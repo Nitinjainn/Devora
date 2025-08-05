@@ -365,32 +365,108 @@ const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const userId = req.params.id;
 
+  console.log("Password change request:", {
+    userId,
+    hasCurrentPassword: !!currentPassword,
+    hasNewPassword: !!newPassword,
+    authenticatedUserId: req.user?._id,
+    userEmail: req.user?.email
+  });
+
   try {
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      console.log("User not found for ID:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    if (user.authProvider === "email") {
-      if (!currentPassword || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    console.log("Found user:", {
+      userId: user._id,
+      email: user.email,
+      authProvider: user.authProvider,
+      hasPasswordHash: !!user.passwordHash
+    });
+
+    // Security check: Ensure user can only change their own password
+    if (req.user._id.toString() !== user._id.toString()) {
+      console.log("Unauthorized password change attempt:", {
+        authenticatedUser: req.user._id,
+        targetUser: user._id
+      });
+      return res.status(403).json({ message: "You can only change your own password" });
+    }
+
+    // Check if user is email-based (either authProvider is "email" or authProvider is not set/undefined)
+    const isEmailUser = !user.authProvider || user.authProvider === "email";
+    
+    console.log("User authentication type:", {
+      isEmailUser,
+      authProvider: user.authProvider,
+      hasPasswordHash: !!user.passwordHash
+    });
+    
+    if (isEmailUser) {
+      if (!currentPassword) {
+        console.log("Current password missing for email user");
+        return res.status(400).json({ message: "Current password is required" });
+      }
+      
+      if (!user.passwordHash) {
+        console.log("No password hash found for email user");
+        return res.status(400).json({ message: "No password found for this account" });
+      }
+      
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      console.log("Password validation result:", { isValid: isCurrentPasswordValid });
+      
+      if (!isCurrentPasswordValid) {
         return res.status(401).json({ message: "Incorrect current password" });
       }
     }
 
+    // Validate new password
+    if (!newPassword || newPassword.length < 6) {
+      console.log("Invalid new password:", { length: newPassword?.length });
+      return res.status(400).json({ message: "New password must be at least 6 characters long" });
+    }
+
+    console.log("Hashing new password...");
     const newHash = await bcrypt.hash(newPassword, 10);
     user.passwordHash = newHash;
+    console.log("Password hashed successfully");
     
     // Clean enum fields before saving to prevent validation errors
     if (user.courseDuration === '') user.courseDuration = undefined;
     if (user.currentYear === '') user.currentYear = undefined;
     if (user.yearsOfExperience === '') user.yearsOfExperience = undefined;
+    if (user.domain === '') user.domain = undefined;
+    if (user.userType === '') user.userType = undefined;
+    if (user.course === '') user.course = undefined;
+    if (user.courseSpecialization === '') user.courseSpecialization = undefined;
+    if (user.companyName === '') user.companyName = undefined;
+    if (user.jobTitle === '') user.jobTitle = undefined;
+    if (user.organization === '') user.organization = undefined;
+    if (user.position === '') user.position = undefined;
+    if (user.company === '') user.company = undefined;
+    if (user.job_title === '') user.job_title = undefined;
+    if (user.expertise_areas === '') user.expertise_areas = undefined;
+    if (user.judging_experience === '') user.judging_experience = undefined;
+    if (user.bio_judge === '') user.bio_judge = undefined;
+    if (user.experience_years === '') user.experience_years = undefined;
+    if (user.motivation === '') user.motivation = undefined;
+    if (user.previous_events === '') user.previous_events = undefined;
     if (user.preferredHackathonTypes && user.preferredHackathonTypes.includes('')) {
       user.preferredHackathonTypes = user.preferredHackathonTypes.filter(type => type !== '');
     }
     
+    console.log("Saving user with updated password...");
     await user.save();
+    console.log("User saved successfully");
 
     res.json({ message: "Password updated successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Password update error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
