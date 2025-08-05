@@ -10,6 +10,7 @@ import { Eye, EyeOff, Zap, Rocket, Trophy, Brain } from "lucide-react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import axios from "axios"
 import { useAuth } from "../../context/AuthContext"
+import { getDashboardRouteByRole } from "../../utils/roleBasedRouting"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -64,10 +65,9 @@ export default function LoginPage() {
       login(res.data.user, res.data.token);
       if (redirectTo) {
         navigate(redirectTo);
-      } else if (res.data.user.role === "admin") {
-        navigate("/admin");
       } else {
-        navigate("/dashboard");
+        const dashboardRoute = getDashboardRouteByRole(res.data.user);
+        navigate(dashboardRoute);
       }
     } catch (err) {
       setErrorMsg(err.response?.data?.message || "Login failed. Please try again.");
@@ -91,10 +91,9 @@ export default function LoginPage() {
         login(res.data.user, res.data.token);
         if (redirectTo) {
           navigate(redirectTo);
-        } else if (res.data.user.role === "admin") {
-          navigate("/admin");
         } else {
-          navigate("/dashboard");
+          const dashboardRoute = getDashboardRouteByRole(res.data.user);
+          navigate(dashboardRoute);
         }
       } else {
         setTwoFAError("Invalid 2FA code");

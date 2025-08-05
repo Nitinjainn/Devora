@@ -35,6 +35,7 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import TeamsParticipantsPage from "./pages/mainDashboard/partipantDashboard/components/TeamsParticipantsPage";
 import PrivateRoute from "./components/PrivateRoute";
+import RoleBasedRedirect from "./components/RoleBasedRedirect";
 
 function App() {
   return (
@@ -59,7 +60,7 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Navigate to="/dashboard/profile" replace />
+              <RoleBasedRedirect />
             </PrivateRoute>
           }
         />

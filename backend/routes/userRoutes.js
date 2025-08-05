@@ -47,7 +47,7 @@ router.get('/github/callback', (req, res, next) => {
           console.warn('Failed to parse OAuth state:', err);
         }
       }
-      const baseRedirectUrl = `http://localhost:5173/oauth-success?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&_id=${user._id}&profileCompleted=${user.profileCompleted || false}&authProvider=github`;
+      const baseRedirectUrl = `http://localhost:5173/oauth-success?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&_id=${user._id}&role=${user.role}&profileCompleted=${user.profileCompleted || false}&authProvider=github`;
       const redirectUrl = redirectTo ? `${baseRedirectUrl}&redirectTo=${encodeURIComponent(redirectTo)}` : baseRedirectUrl;
       res.redirect(redirectUrl);
     });
@@ -75,7 +75,7 @@ router.get('/google/callback', (req, res, next) => {
           console.warn('Failed to parse OAuth state:', err);
         }
       }
-      const baseRedirectUrl = `http://localhost:5173/oauth-success?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&_id=${user._id}&profileCompleted=${user.profileCompleted || false}&authProvider=google`;
+      const baseRedirectUrl = `http://localhost:5173/oauth-success?token=${token}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}&_id=${user._id}&role=${user.role}&profileCompleted=${user.profileCompleted || false}&authProvider=google`;
       const redirectUrl = redirectTo ? `${baseRedirectUrl}&redirectTo=${encodeURIComponent(redirectTo)}` : baseRedirectUrl;
       res.redirect(redirectUrl);
     });

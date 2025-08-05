@@ -63,6 +63,7 @@ import NotificationBell from '../../components/DashboardUI/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/DashboardUI/avatar';
 import useDropdownTimeout from '../../hooks/useDropdownTimeout';
 import OrganizerSubmissionView from "./organizerDashboard/OrganizerSubmissionView";
+import { getDashboardRouteByRole } from '../../utils/roleBasedRouting';
 
 export default function HackZenDashboard() {
   const location = useLocation();
@@ -125,13 +126,8 @@ export default function HackZenDashboard() {
       location.pathname === "/dashboard" ||
       location.pathname === "/dashboard/"
     ) {
-      if (authUser?.role === "organizer") {
-        navigate("/dashboard/organizer-tools", { replace: true });
-      } else if (authUser?.role === "judge") {
-        navigate("/dashboard/judge-panel", { replace: true });
-      } else {
-        navigate("/dashboard/profile", { replace: true});
-      }
+      const dashboardRoute = getDashboardRouteByRole(authUser);
+      navigate(dashboardRoute, { replace: true });
     }
     // Update currentView when URL changes
     setCurrentView(getActiveSectionFromPath());

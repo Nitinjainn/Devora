@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { getDashboardRouteByRole } from "../utils/roleBasedRouting";
 
 const AuthContext = createContext();
 
@@ -115,15 +116,18 @@ export const AuthProvider = ({ children }) => {
     const name = url.get("name");
     const email = url.get("email");
     const id = url.get("id");
+    const role = url.get("role");
 
     if (oauthToken && name && email && id) {
       const userData = {
         _id: id,
         name,
         email,
+        role,
       };
       login(userData, oauthToken);
-      navigate("/dashboard");
+      const dashboardRoute = getDashboardRouteByRole(userData);
+      navigate(dashboardRoute);
     }
   }, [location]);
 

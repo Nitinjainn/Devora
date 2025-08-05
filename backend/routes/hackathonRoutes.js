@@ -60,7 +60,7 @@ router.post('/:hackathonId/send-certificates', protect, isOrganizerOrAdmin, send
 
 // 🌐 Get all approved hackathons and a single hackathon by ID
 router.get('/', getAllHackathons);
-router.get('/:id', getHackathonById);
+router.get('/:id', protect, getHackathonById);
 
 
 module.exports = router;

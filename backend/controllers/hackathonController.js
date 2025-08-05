@@ -211,20 +211,48 @@ exports.getAllHackathonsRaw = async (req, res) => {
 // ✅ Get single hackathon by ID
 exports.getHackathonById = async (req, res) => {
  try {
+  console.log('getHackathonById called:', {
+    hackathonId: req.params.id,
+    userId: req.user?._id,
+    userRole: req.user?.role,
+    userEmail: req.user?.email
+  });
+
   const hackathon = await Hackathon.findById(req.params.id)
    .populate('organizer', 'name');
 
-  if (!hackathon) return res.status(404).json({ message: 'Hackathon not found' });
+  if (!hackathon) {
+    console.log('Hackathon not found for ID:', req.params.id);
+    return res.status(404).json({ message: 'Hackathon not found' });
+  }
+
+  console.log('Found hackathon:', {
+    id: hackathon._id,
+    title: hackathon.title,
+    organizerId: hackathon.organizer?._id,
+    approvalStatus: hackathon.approvalStatus
+  });
  
   // Check if user is admin or the organizer
   const isAdmin = req.user?.role === 'admin';
-  const isOrganizer = req.user?.id === hackathon.organizer?._id?.toString();
+  const isOrganizer = req.user?._id?.toString() === hackathon.organizer?._id?.toString();
+ 
+  console.log('Access check:', {
+    isAdmin,
+    isOrganizer,
+    userRole: req.user?.role,
+    userId: req.user?._id?.toString(),
+    organizerId: hackathon.organizer?._id?.toString(),
+    approvalStatus: hackathon.approvalStatus
+  });
  
   // Only allow access if hackathon is approved, or user is admin/organizer
   if (!isAdmin && !isOrganizer && hackathon.approvalStatus !== 'approved') {
+   console.log('Access denied - not admin, not organizer, and not approved');
    return res.status(404).json({ message: 'Hackathon not found' });
   }
  
+  console.log('Access granted - returning hackathon');
   res.json(hackathon);
  } catch (err) {
   console.error('❌ Error in getHackathonById:', err);
