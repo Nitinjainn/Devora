@@ -214,59 +214,6 @@ const EmailSenderModal = ({
         </div>
 
         <div className="space-y-6">
-          {/* Email Configuration Status */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
-              Email Configuration
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant={emailConfig.smtpConfigured ? "default" : "destructive"}>
-                  {emailConfig.smtpConfigured ? "✅ Configured" : "❌ Not Configured"}
-                </Badge>
-                <span className="text-sm text-gray-600">
-                  {emailConfig.smtpConfigured 
-                    ? "SMTP is properly configured" 
-                    : "Please configure SMTP settings in backend/.env file"
-                  }
-                </span>
-              </div>
-              
-              {!emailConfig.smtpConfigured && (
-                <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
-                  <p><strong>To configure emails:</strong></p>
-                  <ol className="list-decimal list-inside mt-1 space-y-1">
-                    <li>Add SMTP settings to backend/.env file</li>
-                    <li>Restart the backend server</li>
-                    <li>Test the configuration below</li>
-                  </ol>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Test Email Configuration */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Test Email Configuration</h3>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter test email address"
-                value={emailConfig.testEmail}
-                onChange={(e) => setEmailConfig(prev => ({ ...prev, testEmail: e.target.value }))}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-              />
-              <Button
-                onClick={testEmailConfiguration}
-                disabled={loading || !emailConfig.testEmail}
-                variant="outline"
-                size="sm"
-              >
-                {loading ? 'Sending...' : 'Test Email'}
-              </Button>
-            </div>
-          </div>
 
           {/* Email Recipients */}
           <div className="space-y-4">
