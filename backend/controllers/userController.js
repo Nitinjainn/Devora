@@ -292,6 +292,15 @@ const updateUser = async (req, res) => {
       Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
     );
 
+    // Clean enum fields before updating to prevent validation errors
+    if (updates.courseDuration === '') updates.courseDuration = undefined;
+    if (updates.currentYear === '') updates.currentYear = undefined;
+    if (updates.yearsOfExperience === '') updates.yearsOfExperience = undefined;
+    if (updates.domain === '') updates.domain = undefined;
+    if (updates.preferredHackathonTypes && updates.preferredHackathonTypes.includes('')) {
+      updates.preferredHackathonTypes = updates.preferredHackathonTypes.filter(type => type !== '');
+    }
+
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -347,6 +356,7 @@ const changeUserRole = async (req, res) => {
     if (user.courseDuration === '') user.courseDuration = undefined;
     if (user.currentYear === '') user.currentYear = undefined;
     if (user.yearsOfExperience === '') user.yearsOfExperience = undefined;
+    if (user.domain === '') user.domain = undefined;
     if (user.preferredHackathonTypes && user.preferredHackathonTypes.includes('')) {
       user.preferredHackathonTypes = user.preferredHackathonTypes.filter(type => type !== '');
     }
@@ -871,6 +881,16 @@ const completeProfile = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized' });
     }
     const updateFields = { ...req.body, profileCompleted: true };
+    
+    // Clean enum fields before updating to prevent validation errors
+    if (updateFields.courseDuration === '') updateFields.courseDuration = undefined;
+    if (updateFields.currentYear === '') updateFields.currentYear = undefined;
+    if (updateFields.yearsOfExperience === '') updateFields.yearsOfExperience = undefined;
+    if (updateFields.domain === '') updateFields.domain = undefined;
+    if (updateFields.preferredHackathonTypes && updateFields.preferredHackathonTypes.includes('')) {
+      updateFields.preferredHackathonTypes = updateFields.preferredHackathonTypes.filter(type => type !== '');
+    }
+    
     // Remove fields that should not be updated directly
     delete updateFields._id;
     delete updateFields.email; // Email should not be changed here

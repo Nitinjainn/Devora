@@ -206,8 +206,14 @@ export function ProfileSection({ viewUserId }) {
     }
   };
 
-  // Fetch 2FA status from backend
+  // Fetch 2FA status from backend (only for email users)
   const fetch2FAStatus = async () => {
+    // Only fetch 2FA status for email users
+    if (user?.authProvider && user.authProvider !== "email") {
+      setTwoFactorEnabled(false);
+      return;
+    }
+    
     try {
       console.log("Fetching 2FA status...");
       const token = localStorage.getItem("token");
@@ -235,24 +241,29 @@ export function ProfileSection({ viewUserId }) {
   // Handle 2FA toggle
   const handle2FAToggle = async (enabled) => {
     console.log("2FA toggle clicked:", enabled);
+    
+    // Only allow 2FA operations for email users
+    if (user?.authProvider && user.authProvider !== "email") {
+      console.log("2FA not available for OAuth users");
+      return;
+    }
+    
     if (enabled) {
       setShow2FASetup(true);
     } else {
-      // Check if user is OAuth (no password required) or email (password required)
-      const isOAuthUser = user?.authProvider && user.authProvider !== "email";
-
-      if (isOAuthUser) {
-        // For OAuth users, disable directly without password
-        await handleDisable2FA(null);
-      } else {
-        // For email users, show password modal
-        setShowPasswordModal(true);
-      }
+      // For email users, show password modal
+      setShowPasswordModal(true);
     }
   };
 
-  // Handle 2FA disable
+  // Handle 2FA disable (only for email users)
   const handleDisable2FA = async (currentPassword) => {
+    // Only allow 2FA operations for email users
+    if (user?.authProvider && user.authProvider !== "email") {
+      console.log("2FA not available for OAuth users");
+      return;
+    }
+    
     setTwoFALoading(true);
     setTwoFAError("");
 
@@ -2124,82 +2135,86 @@ export function ProfileSection({ viewUserId }) {
         </Card>
       )}
 
-      {/* 2FA Section */}
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Two-Factor Authentication
-          </CardTitle>
-          <CardDescription>
-            Add an extra layer of security to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {twoFAError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{twoFAError}</p>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-sm font-medium">Enable 2FA</span>
-              <p className="text-xs text-gray-500">
-                Secure your account with two-factor authentication
-              </p>
-            </div>
-            <Switch
-              checked={twoFactorEnabled}
-              onCheckedChange={handle2FAToggle}
-              disabled={twoFALoading}
-            />
-          </div>
-
-          {twoFactorEnabled && (
-            <div className="p-4 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2 text-green-800">
-                <Shield className="w-4 h-4" />
-                <span className="text-sm font-medium">2FA is enabled</span>
+      {/* 2FA Section - Only show for email users */}
+      {user?.authProvider === "email" && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Two-Factor Authentication
+            </CardTitle>
+            <CardDescription>
+              Add an extra layer of security to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {twoFAError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-sm">{twoFAError}</p>
               </div>
-              <p className="text-xs text-green-600 mt-1">
-                Use your authenticator app to sign in securely
-              </p>
-            </div>
-          )}
+            )}
 
-          {!twoFactorEnabled && !show2FASetup && (
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Shield className="w-4 h-4" />
-                <span className="text-sm font-medium">2FA is disabled</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium">Enable 2FA</span>
+                <p className="text-xs text-gray-500">
+                  Secure your account with two-factor authentication
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Enable 2FA for enhanced account security
-              </p>
-            </div>
-          )}
-
-          {show2FASetup && (
-            <div className="border-t pt-4">
-              <TwoFASetup
-                token={token}
-                onSuccess={handle2FASuccess}
-                onCancel={handle2FACancel}
+              <Switch
+                checked={twoFactorEnabled}
+                onCheckedChange={handle2FAToggle}
+                disabled={twoFALoading}
               />
             </div>
-          )}
 
-          {/* Password Modal for 2FA Disable */}
-          <PasswordModal
-            isOpen={showPasswordModal}
-            onClose={handlePasswordModalClose}
-            onConfirm={handlePasswordConfirm}
-            loading={twoFALoading}
-            error={twoFAError}
-          />
-        </CardContent>
-      </Card>
+            {twoFactorEnabled && (
+              <div className="p-4 bg-green-50 rounded-lg">
+                <div className="flex items-center gap-2 text-green-800">
+                  <Shield className="w-4 h-4" />
+                  <span className="text-sm font-medium">2FA is enabled</span>
+                </div>
+                <p className="text-xs text-green-600 mt-1">
+                  Use your authenticator app to sign in securely
+                </p>
+              </div>
+            )}
+
+            {!twoFactorEnabled && !show2FASetup && (
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Shield className="w-4 h-4" />
+                  <span className="text-sm font-medium">2FA is disabled</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Enable 2FA for enhanced account security
+                </p>
+              </div>
+            )}
+
+            {show2FASetup && (
+              <div className="border-t pt-4">
+                <TwoFASetup
+                  token={token}
+                  onSuccess={handle2FASuccess}
+                  onCancel={handle2FACancel}
+                />
+              </div>
+            )}
+
+            {/* Password Modal for 2FA Disable */}
+            <PasswordModal
+              isOpen={showPasswordModal}
+              onClose={handlePasswordModalClose}
+              onConfirm={handlePasswordConfirm}
+              loading={twoFALoading}
+              error={twoFAError}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      
 
       {/* Privacy Settings */}
       <Card className="w-full">

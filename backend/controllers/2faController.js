@@ -16,8 +16,17 @@ exports.generate2FA = async (req, res) => {
   console.log('2FA generate endpoint called:', {
     userId: req.user?._id,
     email: req.user?.email,
-    hasUser: !!req.user
+    hasUser: !!req.user,
+    authProvider: req.user?.authProvider
   });
+
+  // Only allow 2FA for email users
+  if (req.user?.authProvider && req.user.authProvider !== 'email') {
+    console.log('2FA not available for OAuth users');
+    return res.status(403).json({ 
+      message: 'Two-factor authentication is not available for OAuth users. Your account is already secured through your OAuth provider.' 
+    });
+  }
 
   try {
     const secret = speakeasy.generateSecret({ 
@@ -31,6 +40,7 @@ exports.generate2FA = async (req, res) => {
     if (req.user.courseDuration === '') req.user.courseDuration = undefined;
     if (req.user.currentYear === '') req.user.currentYear = undefined;
     if (req.user.yearsOfExperience === '') req.user.yearsOfExperience = undefined;
+    if (req.user.domain === '') req.user.domain = undefined;
     if (req.user.preferredHackathonTypes && req.user.preferredHackathonTypes.includes('')) {
       req.user.preferredHackathonTypes = req.user.preferredHackathonTypes.filter(type => type !== '');
     }
@@ -60,8 +70,18 @@ exports.verify2FA = async (req, res) => {
   console.log('2FA verify endpoint called:', {
     userId: req.user?._id,
     email: req.user?.email,
-    hasUser: !!req.user
+    hasUser: !!req.user,
+    authProvider: req.user?.authProvider
   });
+
+  // Only allow 2FA for email users
+  if (req.user?.authProvider && req.user.authProvider !== 'email') {
+    console.log('2FA not available for OAuth users');
+    return res.status(403).json({ 
+      success: false,
+      message: 'Two-factor authentication is not available for OAuth users. Your account is already secured through your OAuth provider.' 
+    });
+  }
 
   try {
     const { token } = req.body;
@@ -96,6 +116,7 @@ exports.verify2FA = async (req, res) => {
       if (user.courseDuration === '') user.courseDuration = undefined;
       if (user.currentYear === '') user.currentYear = undefined;
       if (user.yearsOfExperience === '') user.yearsOfExperience = undefined;
+      if (user.domain === '') user.domain = undefined;
       if (user.preferredHackathonTypes && user.preferredHackathonTypes.includes('')) {
         user.preferredHackathonTypes = user.preferredHackathonTypes.filter(type => type !== '');
       }
@@ -195,6 +216,15 @@ exports.disable2FA = async (req, res) => {
     body: req.body
   });
 
+  // Only allow 2FA for email users
+  if (req.user?.authProvider && req.user.authProvider !== 'email') {
+    console.log('2FA not available for OAuth users');
+    return res.status(403).json({ 
+      success: false,
+      message: 'Two-factor authentication is not available for OAuth users. Your account is already secured through your OAuth provider.' 
+    });
+  }
+
   try {
     const { currentPassword } = req.body;
     
@@ -280,8 +310,18 @@ exports.get2FAStatus = async (req, res) => {
   console.log('2FA status endpoint called:', {
     userId: req.user?._id,
     email: req.user?.email,
-    hasUser: !!req.user
+    hasUser: !!req.user,
+    authProvider: req.user?.authProvider
   });
+
+  // For OAuth users, return disabled status
+  if (req.user?.authProvider && req.user.authProvider !== 'email') {
+    console.log('OAuth user - returning disabled 2FA status');
+    return res.json({
+      enabled: false,
+      setup: false
+    });
+  }
 
   try {
     const user = await User.findById(req.user._id);
