@@ -130,7 +130,6 @@ export default function JudgeAssignedProjectsGallery({ hackathonId, onProjectCli
       score: submission.score,
       totalScore: submission.totalScore,
       averageScore: submission.averageScore,
-      isEvaluated: submission.isEvaluated,
       evaluated: submission.evaluated,
       scored: submission.scored,
       judgeScoresLength: judgeScores?.length || 0
