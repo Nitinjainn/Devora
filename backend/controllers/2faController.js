@@ -171,6 +171,7 @@ exports.login2FA = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileCompleted: user.profileCompleted || false,
         twoFA: user.twoFA
       },
       token: authToken,

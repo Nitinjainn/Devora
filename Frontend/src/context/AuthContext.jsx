@@ -124,6 +124,7 @@ export const AuthProvider = ({ children }) => {
         name,
         email,
         role,
+        profileCompleted: true, // Assume OAuth users have completed profile
       };
       login(userData, oauthToken);
       const dashboardRoute = getDashboardRouteByRole(userData);
