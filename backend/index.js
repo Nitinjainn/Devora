@@ -1,4 +1,6 @@
-// Disable all console.log and console.info output globally
+
+console.log = function () {};
+console.info = function () {};
 
 
 require("dotenv").config();
@@ -7,6 +9,7 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 const cors = require("cors");
+
 const mongoose = require("mongoose");
 const http = require("http");
 const { Server } = require("socket.io");

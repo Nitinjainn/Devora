@@ -2,21 +2,40 @@ import { Input } from "../../../../components/CommonUI/input"
 import { Label } from "../../../../components/CommonUI/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/CommonUI/select"
 import { Textarea } from "../../../../components/CommonUI/textarea"
+import { MultiSelect } from "../../../../components/CommonUI/multiselect"
 
 export default function HackathonPreferencesForm({ formData, errors, onChange }) {
+  // Define the hackathon type options based on backend schema
+  const hackathonTypeOptions = [
+    { value: 'web-development', label: 'Web Development' },
+    { value: 'mobile-app', label: 'Mobile App Development' },
+    { value: 'ai-ml', label: 'AI & Machine Learning' },
+    { value: 'blockchain', label: 'Blockchain' },
+    { value: 'iot', label: 'Internet of Things (IoT)' },
+    { value: 'game-dev', label: 'Game Development' },
+    { value: 'design', label: 'Design' },
+    { value: 'social-impact', label: 'Social Impact' },
+    { value: 'fintech', label: 'FinTech' },
+    { value: 'healthtech', label: 'HealthTech' },
+    { value: 'edtech', label: 'EdTech' },
+    { value: 'other', label: 'Other' }
+  ];
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="preferredHackathonTypes" className="text-[#111827] font-medium">
           Preferred Hackathon Types
         </Label>
-        <Input
-          id="preferredHackathonTypes"
-          value={formData.preferredHackathonTypes}
-          onChange={e => onChange("preferredHackathonTypes", e.target.value)}
-          placeholder="web-development, ai-ml, blockchain, etc. (comma separated)"
-          className="border-gray-200 focus:border-[#4F46E5] focus:ring-[#4F46E5]"
+        <MultiSelect
+          options={hackathonTypeOptions}
+          value={formData.preferredHackathonTypes || []}
+          onChange={value => onChange("preferredHackathonTypes", value)}
+          placeholder="Select your preferred hackathon types"
         />
+        {errors?.preferredHackathonTypes && (
+          <p className="text-sm text-red-600">{errors.preferredHackathonTypes}</p>
+        )}
       </div>
 
       <div className="space-y-2">

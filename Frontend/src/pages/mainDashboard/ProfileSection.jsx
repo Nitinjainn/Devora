@@ -47,6 +47,7 @@ import { Switch } from "../../components/DashboardUI/switch";
 import { Input } from "../../components/CommonUI/input";
 import { Label } from "../../components/CommonUI/label";
 import { Textarea } from "../../components/CommonUI/textarea";
+import { MultiSelect } from "../../components/CommonUI/multiselect";
 import { useAuth } from "../../context/AuthContext";
 import {PublicProfileView} from "./PublicProfileView";
 import StreakGraphic from "../../components/DashboardUI/StreakGraphic";
@@ -82,6 +83,22 @@ export function ProfileSection({ viewUserId }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, token, login } = useAuth();
+
+  // Define the hackathon type options based on backend schema
+  const hackathonTypeOptions = [
+    { value: 'web-development', label: 'Web Development' },
+    { value: 'mobile-app', label: 'Mobile App Development' },
+    { value: 'ai-ml', label: 'AI & Machine Learning' },
+    { value: 'blockchain', label: 'Blockchain' },
+    { value: 'iot', label: 'Internet of Things (IoT)' },
+    { value: 'game-dev', label: 'Game Development' },
+    { value: 'design', label: 'Design' },
+    { value: 'social-impact', label: 'Social Impact' },
+    { value: 'fintech', label: 'FinTech' },
+    { value: 'healthtech', label: 'HealthTech' },
+    { value: 'edtech', label: 'EdTech' },
+    { value: 'other', label: 'Other' }
+  ];
 
   // All hooks must be called at the top level
   const [selectedImage, setSelectedImage] = useState(null);
@@ -139,7 +156,7 @@ export function ProfileSection({ viewUserId }) {
     twitter: "",
     instagram: "",
     portfolio: "",
-    preferredHackathonTypes: "",
+    preferredHackathonTypes: [],
     teamSizePreference: "any",
     telegram: "",
   });
@@ -393,9 +410,7 @@ export function ProfileSection({ viewUserId }) {
         twitter: data.twitter || "",
         instagram: data.instagram || "",
         portfolio: data.portfolio || "",
-        preferredHackathonTypes: data.preferredHackathonTypes
-          ? data.preferredHackathonTypes.join(", ")
-          : "",
+        preferredHackathonTypes: data.preferredHackathonTypes || [],
         teamSizePreference: data.teamSizePreference || "any",
         telegram: data.telegram || "",
       });
@@ -1865,14 +1880,14 @@ export function ProfileSection({ viewUserId }) {
               </select>
             </div>
             <div>
-              <Label htmlFor="preferredHackathonTypes">Preferred Hackathon Types (comma separated)</Label>
-              <Input
-                id="preferredHackathonTypes"
+              <Label htmlFor="preferredHackathonTypes">Preferred Hackathon Types</Label>
+              <MultiSelect
+                options={hackathonTypeOptions}
                 value={editForm.preferredHackathonTypes}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, preferredHackathonTypes: e.target.value })
+                onChange={(value) =>
+                  setEditForm({ ...editForm, preferredHackathonTypes: value })
                 }
-                placeholder="e.g., web-development, ai-ml, blockchain"
+                placeholder="Select your preferred hackathon types"
               />
             </div>
           </div>
@@ -2305,9 +2320,7 @@ export function ProfileSection({ viewUserId }) {
       twitter: editForm.twitter,
       instagram: editForm.instagram,
       portfolio: editForm.portfolio,
-      preferredHackathonTypes: processArrayField(
-        editForm.preferredHackathonTypes
-      ),
+      preferredHackathonTypes: editForm.preferredHackathonTypes,
       teamSizePreference: editForm.teamSizePreference,
       telegram: editForm.telegram,
     };

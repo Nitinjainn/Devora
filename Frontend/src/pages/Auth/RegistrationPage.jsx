@@ -92,7 +92,7 @@ export default function SignupPage() {
     discord: "",
 
     // Hackathon Preferences
-    preferredHackathonTypes: "",
+    preferredHackathonTypes: [],
     teamSizePreference: "",
 
     // Organizer specific
@@ -270,6 +270,18 @@ export default function SignupPage() {
         case "participant":
           if (!formData.skills.trim()) errors.skills = "Skills are required"
           break
+      }
+    }
+
+    if (currentStep === 8 && selectedRole === "participant") {
+      if (!formData.preferredHackathonTypes || formData.preferredHackathonTypes.length === 0) {
+        errors.preferredHackathonTypes = "Please select at least one preferred hackathon type"
+      }
+      if (!formData.teamSizePreference.trim()) {
+        errors.teamSizePreference = "Team size preference is required"
+      }
+      if (!formData.bio.trim()) {
+        errors.bio = "Bio is required"
       }
     }
 

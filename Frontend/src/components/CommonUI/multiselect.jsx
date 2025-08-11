@@ -25,7 +25,7 @@ export function MultiSelect({ options, value, onChange, placeholder }) {
     <div className="relative" style={{ maxWidth: "100%", minWidth: 0 }}>
       <button
         type="button"
-        className="flex h-10 w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="flex h-10 w-full items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-offset-2"
         onClick={toggle}
         style={{ maxWidth: "100%", minWidth: 0 }}
         title={fullText}
@@ -54,7 +54,7 @@ export function MultiSelect({ options, value, onChange, placeholder }) {
                 type="checkbox"
                 checked={value.includes(opt.value)}
                 onChange={() => handleSelect(opt.value)}
-                className="mr-2 accent-indigo-600"
+                className="mr-2 accent-[#4F46E5]"
               />
               <span
                 className="text-sm truncate overflow-x-hidden block"
