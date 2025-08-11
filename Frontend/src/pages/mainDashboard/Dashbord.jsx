@@ -73,11 +73,23 @@ export default function HackZenDashboard() {
   // Extract the active section from the current URL path
   const getActiveSectionFromPath = () => {
     const path = location.pathname;
-    if (path.match(/^\/dashboard\/organizer\/submission\//)) return "organizer-submission";
+    console.log("🔍 getActiveSectionFromPath - Processing path:", path);
+    
+    if (path.match(/^\/dashboard\/organizer\/submission\//)) {
+      console.log("🔍 getActiveSectionFromPath - Matched organizer submission, returning: organizer-submission");
+      return "organizer-submission";
+    }
+    
     // Generalize: any judge route
-    if (path.startsWith("/dashboard/judge")) return "judge-panel";
+    if (path.startsWith("/dashboard/judge")) {
+      console.log("🔍 getActiveSectionFromPath - Matched judge route, returning: judge-panel");
+      return "judge-panel";
+    }
+    
     const match = path.match(/^\/dashboard\/([^/]+)/);
-    return match ? match[1] : "profile";
+    const result = match ? match[1] : "profile";
+    console.log("🔍 getActiveSectionFromPath - Final result:", result, "for path:", path);
+    return result;
   };
 
   const [currentView, setCurrentView] = useState(getActiveSectionFromPath());
@@ -113,8 +125,12 @@ export default function HackZenDashboard() {
 
   // Function to handle section changes with nested URLs
   const changeView = (viewKey) => {
+    console.log("🔍 changeView - Called with viewKey:", viewKey);
+    console.log("🔍 changeView - Current pathname before navigation:", location.pathname);
     setCurrentView(viewKey);
-    navigate(`/dashboard/${viewKey}`);
+    const targetPath = `/dashboard/${viewKey}`;
+    console.log("🔍 changeView - Navigating to:", targetPath);
+    navigate(targetPath);
   };
 
   // Function to navigate to home page
@@ -122,19 +138,29 @@ export default function HackZenDashboard() {
     navigate("/");
   };
 
-  // Set default route on component mount
+  // Set default route on component mount - ONLY when at root dashboard
   useEffect(() => {
+    console.log("🔍 Dashboard useEffect - Running with pathname:", location.pathname);
+    console.log("🔍 Dashboard useEffect - Current user role:", authUser?.role);
+    console.log("🔍 Dashboard useEffect - Current view state:", currentView);
+    
+    // Only redirect if we're at the exact root dashboard path
+    // Don't redirect if user is trying to access a specific section like /dashboard/profile
     if (
       location.pathname === "/dashboard" ||
       location.pathname === "/dashboard/"
     ) {
       const dashboardRoute = getDashboardRouteByRole(authUser);
-      console.log("🔍 Dashboard - Redirecting to route:", dashboardRoute, "for user role:", authUser?.role);
+      console.log("🔍 Dashboard useEffect - Redirecting to route:", dashboardRoute, "for user role:", authUser?.role);
       navigate(dashboardRoute, { replace: true });
+    } else if (location.pathname.startsWith("/dashboard/")) {
+      // If we're at a specific dashboard section, just update the current view
+      const newView = getActiveSectionFromPath();
+      console.log("🔍 Dashboard useEffect - Setting current view to:", newView, "from path:", location.pathname);
+      setCurrentView(newView);
     }
-    // Update currentView when URL changes
-    setCurrentView(getActiveSectionFromPath());
-  }, [location.pathname, navigate, params.section, authUser?.role]);
+    // If it's any other path, don't do anything
+  }, [location.pathname, navigate]);
 
   const participantMenuItems = [
     {
@@ -512,7 +538,10 @@ export default function HackZenDashboard() {
                       <Link
                         to="/dashboard/profile"
                         className="block px-4 py-2 hover:bg-gray-100 text-gray-900 border-b border-gray-200"
-                        onClick={() => setShowProfileDropdown(false)}
+                        onClick={() => {
+                          console.log("🔍 Profile dropdown - Profile link clicked, navigating to /dashboard/profile");
+                          setShowProfileDropdown(false);
+                        }}
                       >
                         Profile
                       </Link>

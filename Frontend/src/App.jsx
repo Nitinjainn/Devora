@@ -64,6 +64,35 @@ function App() {
             </PrivateRoute>
           }
         />
+        
+        {/* Profile routes - must come BEFORE the generic :section route */}
+        <Route path="/dashboard/profile" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/profile/:id" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/profile/edit" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route
+          path="/dashboard/profile/account-settings"
+          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
+        />
+        <Route
+          path="/dashboard/profile/privacy-security"
+          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
+        />
+        <Route
+          path="/dashboard/profile/help-support"
+          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
+        />
+        
+        {/* Other specific dashboard routes */}
+        <Route path="/dashboard/my-hackathons" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/my-hackathons/:projectId" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/my-submissions/:projectId" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/project-archive" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/project-archive/:id" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+        <Route path="/dashboard/created-hackathons/:hackathonId/teams/:teamId" element={<PrivateRoute><TeamsParticipantsPage /></PrivateRoute>} />
+        <Route path="/dashboard/created-hackathons/:hackathonId/teams" element={<PrivateRoute><TeamsParticipantsPage /></PrivateRoute>} />
+        <Route path="/dashboard/created-hackathons/:hackathonId" element={<PrivateRoute><DashboardPage/></PrivateRoute>} />
+        
+        {/* Generic dashboard section route - must come LAST */}
         <Route
           path="/dashboard/:section"
           element={
@@ -97,46 +126,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/dashboard/my-hackathons"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard/my-hackathons/:projectId"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard/my-submissions/:projectId"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard/project-archive"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard/project-archive/:id"
-          element={
-            <PrivateRoute>
-              <DashboardPage />
-            </PrivateRoute>
-          }
-        />
+
 
         {/* Created Hackathons */}
         <Route path="/dashboard/created-hackathons/:hackathonId/teams/:teamId" element={<PrivateRoute><TeamsParticipantsPage /></PrivateRoute>} />
@@ -148,22 +138,7 @@ function App() {
         <Route path="/dashboard/edit-hackathon/:id" element={<PrivateRoute><EditHackathonPage /></PrivateRoute>} />
 
 
-        {/* Profile */}
-        <Route path="/dashboard/profile" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-        <Route path="/dashboard/profile/:id" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-        <Route path="/dashboard/profile/edit" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
-        <Route
-          path="/dashboard/profile/account-settings"
-          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
-        />
-        <Route
-          path="/dashboard/profile/privacy-security"
-          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
-        />
-        <Route
-          path="/dashboard/profile/help-support"
-          element={<PrivateRoute><DashboardPage /></PrivateRoute>}
-        />
+        {/* Profile routes are now defined earlier in the file */}
         <Route path="/profile/:userId" element={<PublicProfileViewWrapper />} />
         <Route path="/invite/:inviteId" element={<InviteAccept />} />
         <Route path="/invite/role" element={<InviteRole />} />
