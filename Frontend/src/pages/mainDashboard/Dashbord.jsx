@@ -108,6 +108,8 @@ export default function HackZenDashboard() {
   // Debug: Log user role for troubleshooting
   console.log("Dashboard - Current user:", authUser);
   console.log("Dashboard - User role:", authUser?.role);
+  console.log("Dashboard - User profileCompleted:", authUser?.profileCompleted);
+  console.log("Dashboard - User authProvider:", authUser?.authProvider);
 
   // Function to handle section changes with nested URLs
   const changeView = (viewKey) => {
@@ -127,6 +129,7 @@ export default function HackZenDashboard() {
       location.pathname === "/dashboard/"
     ) {
       const dashboardRoute = getDashboardRouteByRole(authUser);
+      console.log("🔍 Dashboard - Redirecting to route:", dashboardRoute, "for user role:", authUser?.role);
       navigate(dashboardRoute, { replace: true });
     }
     // Update currentView when URL changes
@@ -532,6 +535,7 @@ export default function HackZenDashboard() {
                           Judge Panel
                         </Link>
                       )}
+
                        {authUser?.role === 'admin' && (
                         <Link
                           to="/admin/dashboard"

@@ -584,8 +584,18 @@ export default function SignupPage() {
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
         );
         // Update AuthContext and redirect
-        await login({ ...user, profileCompleted: true, role: selectedRole === 'organizer' ? 'organizer' : selectedRole }, localStorage.getItem('token'));
-        navigate("/dashboard");
+        const updatedUserData = { 
+          ...user, 
+          profileCompleted: true, 
+          role: selectedRole === 'organizer' ? 'organizer' : selectedRole 
+        };
+        console.log("🔍 OAuth Registration - Updated user data:", updatedUserData);
+        await login(updatedUserData, localStorage.getItem('token'));
+        
+        // Force refresh user data to ensure role is properly set
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 100);
         return;
       }
       // 1. Register user (name, email, password)

@@ -10,6 +10,22 @@ const PendingUser = require('../model/PendingUserModel');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const PasswordResetToken = require('../model/PasswordResetTokenModel');
+
+// Additional models for complete user deletion
+const SubmissionModel = require('../model/SubmissionModel');
+const SubmissionHistoryModel = require('../model/SubmissionHistoryModel');
+const HackathonRegistrationModel = require('../model/HackathonRegistrationModel');
+const TeamModel = require('../model/TeamModel');
+const TeamInviteModel = require('../model/TeamInviteModel');
+const JudgeAssignmentModel = require('../model/JudgeAssignmentModel');
+const ChatMessageModel = require('../model/ChatMessageModel');
+const ChatRoomModel = require('../model/ChatRoomModel');
+const NotificationModel = require('../model/NotificationModel');
+const MessageModel = require('../model/MessageModel');
+const ArticleModel = require('../model/ArticleModel');
+const AnnouncementModel = require('../model/AnnouncementModel');
+const SponsorProposalModel = require('../model/SponsorProposalModel');
+const CertificatePageModel = require('../model/CertificatePageModel');
 // ✅ Generate JWT token
 const generateToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
@@ -310,15 +326,144 @@ const updateUser = async (req, res) => {
   }
 };
 
-// ✅ Delete user
+// ✅ Delete user and all associated data
 const deleteUser = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: 'User deleted' });
+    const userId = req.params.id;
+    console.log('🗑️ Deleting user and all associated data for ID:', userId);
+    
+    // Get user info before deletion for logging
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    console.log('🗑️ Deleting user:', {
+      email: user.email,
+      name: user.name,
+      role: user.role
+    });
+    
+    // Delete user from all related collections
+    const deletePromises = [];
+    
+    // 1. Delete user's projects
+    deletePromises.push(Project.deleteMany({ user: userId }));
+    
+    // 2. Delete user's submissions
+    deletePromises.push(SubmissionModel.deleteMany({ user: userId }));
+    deletePromises.push(SubmissionHistoryModel.deleteMany({ user: userId }));
+    
+    // 3. Delete user's hackathon registrations
+    deletePromises.push(HackathonRegistrationModel.deleteMany({ user: userId }));
+    
+    // 4. Delete user's team memberships and invites
+    deletePromises.push(TeamModel.updateMany(
+      { members: userId },
+      { $pull: { members: userId } }
+    ));
+    deletePromises.push(TeamInviteModel.deleteMany({ 
+      $or: [{ invitedUser: userId }, { invitedBy: userId }] 
+    }));
+    
+    // 5. Delete user's role invites
+    deletePromises.push(RoleInviteModel.deleteMany({ 
+      $or: [{ invitedUser: userId }, { invitedBy: userId }] 
+    }));
+    
+    // 6. Delete user's scores
+    deletePromises.push(ScoreModel.deleteMany({ user: userId }));
+    
+    // 7. Delete user's judge assignments
+    deletePromises.push(JudgeAssignmentModel.deleteMany({ 
+      $or: [{ judge: userId }, { hackathon: { $in: user.hackathonsJoined || [] } }] 
+    }));
+    
+    // 8. Delete user's chat messages and rooms
+    deletePromises.push(ChatMessageModel.deleteMany({ 
+      $or: [{ sender: userId }, { receiver: userId }] 
+    }));
+    deletePromises.push(ChatRoomModel.deleteMany({ 
+      $or: [{ participants: userId }, { createdBy: userId }] 
+    }));
+    
+    // 9. Delete user's notifications
+    deletePromises.push(NotificationModel.deleteMany({ 
+      $or: [{ recipient: userId }, { sender: userId }] 
+    }));
+    
+    // 10. Delete user's messages
+    deletePromises.push(MessageModel.deleteMany({ 
+      $or: [{ sender: userId }, { receiver: userId }] 
+    }));
+    
+    // 11. Delete user's articles
+    deletePromises.push(ArticleModel.deleteMany({ author: userId }));
+    
+    // 12. Delete user's announcements (if they were an organizer)
+    if (user.role === 'organizer') {
+      deletePromises.push(AnnouncementModel.deleteMany({ author: userId }));
+    }
+    
+    // 13. Delete user's hackathons (if they were an organizer)
+    if (user.role === 'organizer') {
+      deletePromises.push(HackathonModel.deleteMany({ organizer: userId }));
+    }
+    
+    // 14. Delete user's organization (if they were an organizer)
+    if (user.role === 'organizer') {
+      deletePromises.push(OrganizationModel.deleteMany({ owner: userId }));
+    }
+    
+    // 15. Delete user's sponsor proposals
+    deletePromises.push(SponsorProposalModel.deleteMany({ 
+      $or: [{ proposer: userId }, { sponsor: userId }] 
+    }));
+    
+    // 16. Delete user's certificate pages (if they were an organizer)
+    if (user.role === 'organizer') {
+      deletePromises.push(CertificatePageModel.deleteMany({ creator: userId }));
+    }
+    
+    // 17. Delete user's password reset tokens
+    deletePromises.push(PasswordResetTokenModel.deleteMany({ user: userId }));
+    
+    // 18. Delete user's pending registrations
+    deletePromises.push(PendingUser.deleteMany({ email: user.email }));
+    
+    // Execute all deletions
+    console.log('🗑️ Executing deletion of', deletePromises.length, 'related data collections...');
+    const results = await Promise.allSettled(deletePromises);
+    
+    // Log deletion results
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        console.log(`✅ Collection ${index + 1} cleaned successfully`);
+      } else {
+        console.log(`❌ Collection ${index + 1} cleanup failed:`, result.reason);
+      }
+    });
+    
+    // Finally, delete the user document
+    await User.findByIdAndDelete(userId);
+    console.log('✅ User and all associated data deleted successfully');
+    
+    res.json({ 
+      message: 'User and all associated data deleted successfully',
+      deletedUser: {
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }
+    });
+    
   } catch (err) {
+    console.error('❌ Error deleting user:', err);
     res.status(500).json({ error: err.message });
   }
 };
+
+
 
 // ✅ Change user role
 const changeUserRole = async (req, res) => {
@@ -882,11 +1027,33 @@ const completeProfile = async (req, res) => {
     }
     const updateFields = { ...req.body, profileCompleted: true };
     
+    // Log the incoming data for debugging
+    console.log('🔍 completeProfile - Incoming data:', {
+      userId,
+      currentUserRole: req.user.role,
+      updateFields: updateFields
+    });
+    
+    // Log specific enum fields for debugging
+    console.log('🔍 completeProfile - Enum field values:', {
+      userType: updateFields.userType,
+      teamSizePreference: updateFields.teamSizePreference,
+      gender: updateFields.gender,
+      courseDuration: updateFields.courseDuration,
+      currentYear: updateFields.currentYear,
+      yearsOfExperience: updateFields.yearsOfExperience,
+      domain: updateFields.domain
+    });
+    
     // Clean enum fields before updating to prevent validation errors
     if (updateFields.courseDuration === '') updateFields.courseDuration = undefined;
     if (updateFields.currentYear === '') updateFields.currentYear = undefined;
     if (updateFields.yearsOfExperience === '') updateFields.yearsOfExperience = undefined;
     if (updateFields.domain === '') updateFields.domain = undefined;
+    if (updateFields.userType === '') updateFields.userType = undefined;
+    if (updateFields.teamSizePreference === '') updateFields.teamSizePreference = undefined;
+    if (updateFields.gender === '') updateFields.gender = undefined;
+    if (updateFields.age === '') updateFields.age = undefined;
     if (updateFields.preferredHackathonTypes && updateFields.preferredHackathonTypes.includes('')) {
       updateFields.preferredHackathonTypes = updateFields.preferredHackathonTypes.filter(type => type !== '');
     }
@@ -897,7 +1064,8 @@ const completeProfile = async (req, res) => {
     delete updateFields.passwordHash;
     delete updateFields.authProvider;
     delete updateFields.createdAt;
-    delete updateFields.role;
+    // Allow role updates during profile completion
+    // delete updateFields.role;
     delete updateFields.twoFA;
     delete updateFields.badges;
     delete updateFields.hackathonsJoined;
@@ -906,14 +1074,67 @@ const completeProfile = async (req, res) => {
     delete updateFields.organization;
     delete updateFields.applicationStatus;
     
+    // Log the final update fields
+    console.log('🔍 completeProfile - Final update fields:', updateFields);
+    
+    // Log cleaned enum fields for debugging
+    console.log('🔍 completeProfile - Cleaned enum fields:', {
+      userType: updateFields.userType,
+      teamSizePreference: updateFields.teamSizePreference,
+      gender: updateFields.gender,
+      courseDuration: updateFields.courseDuration,
+      currentYear: updateFields.currentYear,
+      yearsOfExperience: updateFields.yearsOfExperience,
+      domain: updateFields.domain,
+      age: updateFields.age
+    });
+    
+    // Validate role if it's being updated
+    if (updateFields.role) {
+      const validRoles = ['participant', 'organizer', 'mentor', 'judge', 'admin'];
+      if (!validRoles.includes(updateFields.role)) {
+        return res.status(400).json({ 
+          message: `Invalid role. Must be one of: ${validRoles.join(', ')}` 
+        });
+      }
+      console.log('🔍 completeProfile - Role validation passed:', updateFields.role);
+    } else {
+      console.log('🔍 completeProfile - No role update requested');
+    }
+    
+    console.log('🔍 completeProfile - About to update user with fields:', updateFields);
+    
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updateFields },
-      { new: true }
+      { new: true, runValidators: true }
     );
     if (!updatedUser) return res.status(404).json({ message: 'User not found' });
+    
+    // Log the updated user for debugging
+    console.log('✅ completeProfile - User updated successfully:', {
+      userId: updatedUser._id,
+      role: updatedUser.role,
+      profileCompleted: updatedUser.profileCompleted
+    });
+    
     res.json(updatedUser);
   } catch (err) {
+    console.error('❌ completeProfile - Error:', err);
+    
+    // Provide better error messages for validation errors
+    if (err.name === 'ValidationError') {
+      const validationErrors = Object.keys(err.errors).map(key => ({
+        field: key,
+        message: err.errors[key].message
+      }));
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: validationErrors,
+        details: 'Please check the form fields and ensure all required fields are filled correctly.'
+      });
+    }
+    
     res.status(500).json({ message: err.message });
   }
 };
@@ -1092,6 +1313,7 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+
   changeUserRole,
   changePassword,
   getMyOrganizationStatus,

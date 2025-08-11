@@ -2261,6 +2261,8 @@ export function ProfileSection({ viewUserId }) {
         </CardContent>
       </Card>
 
+
+
       <div className="flex flex-col sm:flex-row gap-3">
         <Button variant="blue" className="w-full sm:w-auto">Save Security Settings</Button>
         <Button
@@ -2597,6 +2599,12 @@ export function ProfileSection({ viewUserId }) {
     }
   };
 
+
+
+
+
+
+
   const handleSaveClick = () => {
     setShowConfirmDialog(true);
   };
@@ -2666,6 +2674,8 @@ const handleConfirmSave = async () => {
           </div>
         </div>
       </div>
+
+
     </div>
   );
 }

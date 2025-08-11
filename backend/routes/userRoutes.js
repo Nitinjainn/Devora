@@ -159,9 +159,11 @@ router.get('/judge-stats', protect, userController.getJudgeStats);
 router.get('/me', protect, userController.getMe);
 
 router.get('/', userController.getAllUsers);
-router.get('/:id', userController.getUserById);
-// Add public profile route
 router.get('/public/:id', userController.getPublicProfile);
+
+
+
+router.get('/:id', userController.getUserById);
 router.put('/:id', protect, userController.updateUser);
 router.delete('/:id', protect, isAdmin, userController.deleteUser);
 router.patch('/:id/role', protect, isOrganizerOrAdmin, userController.changeUserRole);

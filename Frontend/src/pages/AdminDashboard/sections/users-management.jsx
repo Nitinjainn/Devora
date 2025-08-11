@@ -37,6 +37,8 @@ export function UsersManagement() {
   const [loadingExport, setLoadingExport] = useState(false);
   const navigate = useNavigate();
 
+
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
@@ -143,19 +145,29 @@ const getStatusColor = (status) => {
     setTimeout(() => setLoadingExport(false), 1500);
   };
 
-  return (
+
+
+    return (
     <div className="space-y-6 bg-gradient-to-br from-slate-50 via-purple-50 to-slate-50 text-black">
+
+
+
+
       {/* The viewProfileUserId state and its associated modal are removed as per the edit hint. */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Users Management</h1>
-        <Button
-          className="bg-indigo-600 hover:bg-indigo-700"
-          onClick={handleExport}
-          disabled={loadingExport}
-        >
-          {loadingExport ? "Exporting..." : "Export Users"}
-        </Button>
-      </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Users Management</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              className="bg-indigo-600 hover:bg-indigo-700"
+              onClick={handleExport}
+              disabled={loadingExport}
+            >
+              {loadingExport ? "Exporting..." : "Export Users"}
+            </Button>
+          </div>
+        </div>
 
       <Card>
         <CardHeader>
@@ -266,10 +278,7 @@ const getStatusColor = (status) => {
                 );
               }}
             />
-            <DropdownMenuItem className="text-red-400 hover:bg-red-500/10">
-              <Ban className="w-4 h-4 mr-2" />
-              Ban User
-            </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
@@ -316,6 +325,8 @@ const getStatusColor = (status) => {
           )}
         </CardContent>
       </Card>
+
+
     </div>
   );
 }
